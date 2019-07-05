@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<style type="text/css">
+	*{ margin: 0;padding: 0; }
+</style>
+<head>
+	<meta charset="UTF-8">
+	<title>HTML5之Canvas lineWidth</title>
+	<script type="text/javascript">
+		  function drawFour(){
+		  	//获取canvas元素
+		  	var canvas =document.getElementById("canvas");
+		  	var context = canvas.getContext('2d');
+
+		  	//绘制canvas背景
+		  	context.fillStyle = "#EEEEFF";
+		  	context.fillRect(0,0,300,300);
+
+			//绘制 坐标线
+			context.strokeStyle = "black"
+			context.font = 'bold 24px Arial'; //字体只需设置一次
+			context.strokeText(0,0,20); //在 坐标（0，20）处绘制 数字"0" 文本
+			
+			context.beginPath(); //重置路径
+
+			context.moveTo(50,0); //指定线条起点
+			context.lineTo(50,300); //指定线条终点
+			context.strokeText(50,50,20); //绘制 数字"50"
+			
+			context.moveTo(100,0);
+			context.lineTo(100,300);	
+			context.strokeText(100,100,20); //绘制 数字"100"
+
+			context.moveTo(200,0);
+			context.lineTo(200,300);
+			context.strokeText(200,200,20);	//绘制 数字"200"
+
+			context.stroke();  // 3条线 同一路径里 一起 绘制
+
+			context.strokeText(300,260,20); //绘制 数字"300"
+
+		  	//绘制 矩形（蓝色外框），宽高各为100
+		  	context.strokeStyle = "blue";
+			context.lineWidth = 50;
+		  	context.strokeRect(100,100,100,100); //指定坐标范围(100,100)(200,200)
+
+		  	//填充 矩形【不受lineWidth影响，但会影响strokeRect(100,100,100,100)】
+		  	context.fillStyle = "green";
+		  	context.globalAlpha = 0.8; //透明度
+			context.fillRect(100,100,100,100);
+
+			var lineWidth = document.getElementById("lineWidth");
+			var jia = document.getElementById("jia");
+			var jian = document.getElementById("jian");
+			lineWidth.value = context.lineWidth;
+
+			var i; //定义定时器
+			jia.onmousedown = function(){
+					i = setInterval(function(){ //鼠标左键按下后，每持续100ms均要重绘矩形，直到超出限制
+					if(lineWidth.value<50){
+						context.clearRect(75,75,150,150); //先把(75,75)(225,225)矩形坐标中的内容清空
+						context.lineWidth = lineWidth.value++; //把text中数值 +1 后赋给 矩形lineWidth
+						context.strokeRect(100,100,100,100); //在原区域重绘 矩形
+						context.fillStyle = "green";
+						context.fillRect(100,100,100,100);
+					}
+				},100);
+			}
+			jian.onmousedown = function(){
+				i = setInterval(function(){
+					if(lineWidth.value>0){
+						context.clearRect(75,75,150,150);
+						context.lineWidth = lineWidth.value--;
+						context.strokeRect(100,100,100,100);
+						context.fillStyle = "green";
+						context.fillRect(100,100,100,100);
+					}
+				},100);
+			}
+			jia.onmouseup = function(){ //鼠标左键一旦松开，即清除定时器，不再重绘！
+				clearInterval(i);
+			}
+			jian.onmouseup = function(){
+				clearInterval(i);
+			}
+		}
+	</script>
+</head>
+<body onLoad="drawFour()" style="width: 800px;margin: 10px auto">
+	<div style="text-align: center;">
+		<canvas id="canvas" width="300" height="300" ></canvas>
+		<p>
+			<label for="lineWidth">lineWidth：</label>
+			<input type="text" id="lineWidth" size="2" disabled="disabled" />
+			<input type="button" id="jia" value="值增大" />
+			<input type="button" id="jian" value="值减小" />
+		</p>	
+		<span style="font: 12px/16px arial;">结论：中间层即为 <span style="color: green;">绿 fillRect(100,100,100,100)</span> 把 <span style="color: blue;">蓝 strokeRect(100,100,100,100)</span>覆盖的部分
+	</span>	
+	</div>
+</body>
+</html>
