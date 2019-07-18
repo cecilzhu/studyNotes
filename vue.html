@@ -1,0 +1,205 @@
+﻿<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>vue | 学习笔记</title>
+
+        <link rel="author" href="humans.txt">
+        <script src="https://cdn.staticfile.org/vue/2.4.2/vue.min.js"></script>
+        <style>
+        .class-v-bind{
+          background: #444;
+          color: #eee;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        li {
+            list-style: none;
+        }
+        </style>
+    </head>
+    <body>
+    <div id="vue_detail">
+    <!-- 定义函数 -->
+        <h3>title : {{title}}</h3>
+        <h4>{{details()}}</h4>
+        <p> el 参数，它是 DOM 元素中的 id;<br>
+        data 用于定义属性，当前实例中 data对象中 能找到的 所有的属性：title;<br>
+        methods 用于定义的函数，可以通过 return 来返回函数值;<br>
+        {{}}用于输出对象属性和函数返回值。</p>
+    </div>
+    <script type="text/javascript">
+    var json = {title: "vue"};
+        var vm = new Vue({
+            el: '#vue_detail',
+            data: json,
+            methods: { //定义函数
+                details: function() {
+                    return  this.title + " - 学的不仅是技术，更是梦想！";
+                }
+            }
+        });
+
+        if(vm.title === json.title){ //数据属性
+            document.write("vm.title 与 json.title 引用相同的对象！<br><br>");
+        }
+
+        if(vm.$data === json && vm.$el === document.getElementById('vue_detail')){ //实例属性与方法,它们都有前缀 $
+            document.write("vm.$data 与json引用相同的对象！<br>");
+            document.write('vm.$el 与 id="vue_detail" 的元素 引用相同的对象！<br>');
+        }
+        document.write("<h5>可见，vm.title === json.title === vm.$data.title</h5><br><br>");
+    </script>
+
+
+    <h4>v-html</h4>
+    <p>指令 是带有 v- 前缀的特殊属性;<br>
+    指令 用于在表达式的值改变时，将某些行为应用到 DOM 上。</p>
+    <div id="v-html" v-html="message"></div><br><br>
+
+    <h4>v-bind</h4>
+    <div id="v-bind">
+    <!-- v-model指令用在input元素上，创建双向数据绑定。根据复选框是否被选中，自动更新use的值，并重新渲染html节点。 -->
+        <input type="checkbox" v-model="use"> <!-- use为true，复选框被选中，下面的class-v-bind生效 -->
+        <span>class : {{use}}</span>
+        <!-- v-bind 指令被用来响应地更新 HTML属性【class，href，src等】 -->
+        <div v-bind:class="{'class-v-bind':use}">v-bind:class 指令</div>
+        <!-- v-bind:class 可简化为 :class -->
+    </div><br><br>
+
+    <h4>v-if</h4>
+    <ul id="v-if">
+        <li v-if="type === 'A'">A</li>
+        <li v-else-if="type === 'B'">B</li>
+        <li v-else-if="type === 'C'">C</li>
+        <li v-else>Not A/B/C</li>
+    </ul><br><br>
+
+    <h4>v-show</h4>
+    <div id="v-show">
+        <h1 v-show="no">Hello!</h1>
+    </div><br><br>
+
+    <h4>v-for</h4>
+    <ul id="v-for">
+        <li v-for="(value, key, index) in object">{{ index }}. {{ key }} : {{ value }}</li>
+    </ul><br>
+
+    <h5>v-for迭代整数</h5>
+    <ul id="v-for-num">
+    <li v-for="n in 5">{{ n }}</li>
+    </ul><br><br>
+
+    <h4>v-on</h4>
+    <button id="v-on" v-on:click="reverseMessage">点击我激活 v-on指令</button><br><br>
+    <!-- v-on:click 可简化为 @click -->
+
+    <h4>过滤器（原值：abc）</h4>
+    <div id="filters">{{ message | reverseMessage | capitalize  }}</div><br><br>
+
+    <div id = "watch">
+        <p style = "font-size:25px;">计数器: {{ counter }}</p>
+        <button @click = "counter++" style = "font-size:25px;">点我计数器加1</button>
+    </div><br><br>
+
+    <script>
+        new Vue({
+          el: '#v-html',
+          data: {
+            message: '<a href="#v-html">该a链接是使用 指令v-html 嵌入的</a>'
+          }
+        });
+    </script>
+
+    <script>
+        new Vue({
+          el: '#v-bind',
+          data: {
+            use:true
+          }
+        });
+    </script>
+
+    <script>
+        new Vue({
+          el: '#v-if',
+          data: {
+            type: 'C'
+          }
+        });
+    </script>
+
+    <script>
+        new Vue({ //v-show会渲染该节点，但会以css形式显示或隐藏，而非像v-if移除或新增节点。
+          el: '#v-show',
+          data: {
+            no: false
+          }
+        });
+    </script>
+
+    <script>
+    new Vue({
+      el: '#v-for',
+      data: {
+        object: {
+          name: '菜鸟教程',
+          url: 'http://www.runoob.com',
+          slogan: '学的不仅是技术，更是梦想！'
+        }
+      }
+    })
+
+    new Vue({ //迭代整数
+        el: '#v-for-num'
+    });
+    </script>
+
+    <script>
+        new Vue({
+          el: '#v-on',
+          methods: {
+            reverseMessage: function () {
+              this.$el.innerHTML = this.$el.innerHTML.split('').reverse().join('');
+            }
+          }
+        });
+    </script>
+
+    <script>
+    new Vue({
+      el: '#filters',
+      data: {
+        message: 'abc'
+      },
+      filters: {
+        capitalize: function (value) {
+          if (!value) return ''
+          value = value.toString()
+          return value.charAt(0).toUpperCase() + value.slice(1)
+        },
+        reverseMessage: function (value) {
+            value = value.toString();
+            return value.split('').reverse().join('');
+        }
+      }
+    })
+    </script>
+
+    <script type = "text/javascript">
+     var vm = new Vue({
+        el: '#watch',
+        data: {
+           counter: 1
+        }
+     });
+     vm.$watch('counter', function(New, Old) { //实例属性 监听属性$watch
+        alert('计数器值的变化 :' + Old + ' 变为 ' + New + '!');
+     });
+    </script>
+    </body>
+</html>
