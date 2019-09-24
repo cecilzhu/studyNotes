@@ -1,0 +1,251 @@
+﻿<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8">
+<title>列表--简介</title>
+<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+<!-- 以下两个插件用于在IE8以及以下版本浏览器支持HTML5元素和媒体查询，如果不需要用可以移除 -->
+<!--[if lt IE 9]>
+<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+</head>
+
+<body>
+<h1>我是一个h1一级标题</h1>
+<div class="h1">我是一个div一级标题</div>
+
+<h1>孤儿院无私奉献30年<small> --我是一个 副标题</small></h1>
+
+<p>强调 或 加粗 内容的3种方式：class="lead"，<b>b</b>标签，和<strong>strong</strong>标签</p>
+<p>颜色 强调：加class,（
+<span class="text-muted">text-muted</span>,
+<span class="text-primary">text-primary</span>,
+<span class="text-success">text-success</span>,
+<span class="text-info">text-info</span>,
+<span class="text-warning">text-warning</span>,
+<span class="text-danger">text-danger</span>
+）</p>
+
+<div>
+	<h4>文本 对齐方式：class，（text-left,text-center,text-right,text-justify两端对齐 不常用）</h4>
+	<p class="text-left">我居左</p>
+	<p class="text-center">我居中</p>
+	<p class="text-right">我居右</p>
+	<p class="text-justify">There is clearly a need for CSS to be taken seriously by graphic artists. The Zen Garden aims to excite, inspire, and encourage participation. To begin, view some of the existing designs in the list. </p>
+</div>
+
+<!--无序 列表去点-->
+<h4>无序列表去点（取消默认样式）：class，list-unstyled</h4>
+<ul>
+    <li>
+    项目列表
+        <ul>
+        <li>带有项目符号</li>
+        <li>带有项目符号</li>
+        </ul>
+    </li>
+    <li>
+    项目列表
+        <ul class="list-unstyled">
+        <li>去点</li>
+        <li>去点</li>
+        </ul>
+    </li>
+    <li>项目列表</li>
+</ul>
+
+<!--内联 列表-->
+<h4>内联列表：class，list-inline</h4>
+<ul class="list-inline">
+    <li>W3cplus</li>
+    <li>Blog</li>
+    <li>CSS3</li>
+    <li>jQuery</li>
+    <li>PHP</li>
+</ul>
+
+<!--水平自定义 列表-->
+<h4>水平自定义 列表：（dl） class，dl-horizontal</h4>
+<dl class="dl-horizontal">
+    <dt>W3cplus</dt>
+    <dd>一个致力于推广国内前端行业的技术博客。它以探索为己任，不断活跃在行业技术最前沿，努力提供高质量前端技术博文</dd>
+    <dt>慕课网</dt>
+    <dd>一个专业的，真心实意在做培训的网站</dd>
+    <dt>我来测试一个标题，我来测试一个标题</dt>
+    <dd>我在写一个水平定义列表的效果，我在写一个水平定义列表的效果</dd>
+</dl>
+
+<div>
+<!--代码-->
+<!--代码块区域超出最大高度340px，会在Y轴出现滚动条:class,pre-scrollable-->
+<h4>代码：</h4>
+code风格：
+<div>Bootstrap的代码风格有三种：<code>&lt;code&gt;</code></div>
+pre风格：
+<div>
+<pre class="pre-scrollable">
+&lt;ul&gt;
+&lt;li&gt;...&lt;/li&gt;
+&lt;li&gt;...&lt;/li&gt;
+&lt;li&gt;...&lt;/li&gt;
+&lt;li&gt;...&lt;/li&gt;
+&lt;li&gt;...&lt;/li&gt;
+&lt;li&gt;...&lt;/li&gt;
+&lt;li&gt;...&lt;/li&gt;
+&lt;li&gt;...&lt;/li&gt;
+&lt;li&gt;...&lt;/li&gt;
+&lt;li&gt;...&lt;/li&gt;
+&lt;li&gt;...&lt;/li&gt;
+&lt;li&gt;...&lt;/li&gt;
+&lt;li&gt;...&lt;/li&gt;
+&lt;li&gt;...&lt;/li&gt;
+&lt;li&gt;...&lt;/li&gt;
+&lt;li&gt;...&lt;/li&gt;
+&lt;li&gt;...&lt;/li&gt;
+&lt;li&gt;...&lt;/li&gt;
+&lt;li&gt;...&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+</div>
+kbd风格：
+<div>请输入<kbd>ctrl+c</kbd>来复制代码</div>
+</div>
+
+<div>
+<!--表格-->
+<h4>表格：</h4>
+<div>
+    <h5>1.表格(基础table，边框table-bordered，鼠标悬浮table-hover，紧凑table-condensed)</h5>
+<table class="table table-bordered table-hover table-condensed">
+   <thead>
+     <tr>
+       <th>表格标题</th>
+       <th>表格标题</th>
+       <th>表格标题</th>
+     </tr>
+   </thead>
+   <tbody>
+     <tr class="active">
+       <td>表格单元格</td>
+       <td>表格单元格</td>
+       <td>表格单元格</td>
+     </tr>
+     <tr class="success">
+       <td>表格单元格</td>
+       <td>表格单元格</td>
+       <td>表格单元格</td>
+     </tr>
+     <tr class="info">
+       <td>表格单元格</td>
+       <td>表格单元格</td>
+       <td>表格单元格</td>
+     </tr>
+     <tr class="warning">
+       <td>表格单元格</td>
+       <td>表格单元格</td>
+       <td>表格单元格</td>
+     </tr>
+     <tr class="danger">
+       <td>表格单元格</td>
+       <td>表格单元格</td>
+       <td>表格单元格</td>
+     </tr>
+   </tbody>
+ </table>
+ <h5>2.响应式表格(斑马线table-striped)</h5>
+ <div class="table-responsive">
+   <table class="table table-bordered table-striped">
+   <thead>
+     <tr>
+       <th>表格标题</th>
+       <th>表格标题</th>
+       <th>表格标题</th>
+       <th>表格标题</th>
+       <th>表格标题</th>
+       <th>表格标题</th>
+       <th>表格标题</th>
+       <th>表格标题</th>
+     </tr>
+   </thead>
+   <tbody>
+     <tr>
+       <td>表格单元格</td>
+       <td>表格单元格</td>
+       <td>表格单元格</td>
+       <td>表格单元格</td>
+       <td>表格单元格</td>
+       <td>表格单元格</td>
+       <td>表格单元格</td>
+       <td>表格单元格</td>
+     </tr>
+     <tr>
+       <td>表格单元格</td>
+       <td>表格单元格</td>
+       <td>表格单元格</td>
+       <td>表格单元格</td>
+       <td>表格单元格</td>
+       <td>表格单元格</td>
+       <td>表格单元格</td>
+       <td>表格单元格</td>
+     </tr>
+     <tr>
+       <td>表格单元格</td>
+       <td>表格单元格</td>
+       <td>表格单元格</td>
+       <td>表格单元格</td>
+       <td>表格单元格</td>
+       <td>表格单元格</td>
+       <td>表格单元格</td>
+       <td>表格单元格</td>
+     </tr>
+   </tbody>
+ </table>
+</div>
+</div>
+
+<!-- 表单 -->
+<h4>表单：</h4>
+<!-- 基础表单 -->
+<h4>1.基础表单：</h4>
+<form role="form">
+  <div class="form-group">
+    <label for="email">邮箱：</label>
+    <input type="email" class="form-control" id="email" placeholder="请输入您的邮箱地址">
+  </div>
+</form>
+
+<!-- 水平表单 -->
+<h4>2.水平表单：form-horizontal</h4>
+<form class="form-horizontal" role="form">
+  <div class="form-group">
+    <label class="col-sm-1 control-label" for="password">密码</label>
+    <div class="col-sm-11"><input type="password" class="form-control" id="password" placeholder="请输入您的密码"></div>
+  </div>
+</form>
+
+<!-- 内联表单 -->
+<h4>3.内联表单：form-inline（sr-only类 隐藏了label标签）</h4>
+<form class="form-inline" role="form">
+  <div class="form-group">
+    <label  class="sr-only" for="email1">邮箱</label>
+    <input type="email" class="form-control" id="email1" placeholder="请输入您的邮箱地址">
+  </div>
+  <div class="form-group">
+    <label class="control-label" for="password1">密码</label>
+    <input type="password1" class="form-control" id="password1" placeholder="请输入您的密码">
+  </div>
+  <div class="checkbox">
+    <label>
+      <input type="checkbox"> 记住邮箱
+    </label>
+  </div>
+  <button type="submit" class="btn btn-default">进入邮箱</button>
+</form>
+
+<!-- 如果要使用Bootstrap的js插件，必须先调入jQuery -->
+<script src="https://www.imooc.com/static/lib/jquery/1.9.1/jquery.js"></script>
+<!-- 包括所有bootstrap的js插件或者可以根据需要使用的js插件调用　-->
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script> 
+</body>
+</html>
