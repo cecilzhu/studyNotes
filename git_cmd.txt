@@ -27,6 +27,9 @@ git config --global user.email "1260750674@qq.com"
 显示中文
 git config --global core.quotepath false
 
+新建文件
+touch new.text
+
 把文件add到 .git仓库(暂存区)
 git add ./index.html  把当前路径下的index.html文件 放入暂存区
 git add ./  把当前路径下的 所有修改的文件 放入暂存区
@@ -50,6 +53,8 @@ git reset --hard xxxxxx(版本号) 回退到指定 代码提交状态
 
 分支(主支master)
 git branch develop 创建 develop分支
+git branch -D develop  删除 develop分支
+
 git checkout develop 切换到develop分支
 git merge develop (同一个文件名内容合并 与develop内容相一致) 合并后要立即commit
 
