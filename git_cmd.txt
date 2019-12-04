@@ -28,7 +28,9 @@ git config --global user.email "1260750674@qq.com"
 git config --global core.quotepath false
 
 新建文件
-touch new.text
+touch new.txt
+重命名文件
+rm odd.txt new.txt
 
 把文件add到 .git仓库(暂存区)
 git add ./index.html  把当前路径下的index.html文件 放入暂存区
@@ -55,11 +57,13 @@ git reset --hard xxxxxx(版本号) 回退到指定 代码提交状态
 git branch develop 创建 develop分支
 git branch -D develop  删除 develop分支
 
+git checkout -b develop 创建并切换到develop新分支
 git checkout develop 切换到develop分支
 git merge develop (同一个文件名内容合并 与develop内容相一致) 合并后要立即commit
 
 
 git branch -a 或 git branch -r  查看当前 .git仓库 所有分支(查看如github远程仓库分支的话,需要先clone到本地再切换到对应的 .git仓库所在目录)
+
 
 
 
