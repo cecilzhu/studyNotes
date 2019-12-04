@@ -59,7 +59,8 @@ git checkout develop 切换到develop分支
 git merge develop (同一个文件名内容合并 与develop内容相一致) 合并后要立即commit
 
 
-git branch -a 或 git branch -r  查看当前 .git仓库 所有分支(查看如github远程仓库分支的话,需要先clone到本地再切换到对应的 .git仓库所在目录)
+git branch -a【查看当前 .git仓库 所有分支】 或 git branch -r【查看已建立联系的远程分支】
+(查看如github远程仓库分支的话,需要先clone到本地再切换到对应的 .git仓库所在目录)
 
 
 
