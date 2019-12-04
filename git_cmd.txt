@@ -1,4 +1,5 @@
 ﻿touch index.html 新建index.html
+mv odd.txt new.txt 重命名文件
 cat index.html  查看文件内容
 ctrl+c 退出到命令行
 
@@ -27,10 +28,6 @@ git config --global user.email "1260750674@qq.com"
 显示中文
 git config --global core.quotepath false
 
-新建文件
-touch new.txt
-重命名文件
-rm odd.txt new.txt
 
 把文件add到 .git仓库(暂存区)
 git add ./index.html  把当前路径下的index.html文件 放入暂存区
