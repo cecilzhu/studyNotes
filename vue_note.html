@@ -4,10 +4,10 @@
         <meta charset="utf-8">
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>vue | 学习笔记</title>
+        <title>Vue | 学习笔记</title>
 
         <link rel="author" href="humans.txt">
-        <script src="https://cdn.staticfile.org/vue/2.4.2/vue.min.js"></script>
+        <script src="https://cdn.staticfile.org/vue/2.4.2/vue.js"></script>
         <style>
         .class-v-bind{
           background: #444;
@@ -24,28 +24,63 @@
     </head>
     <body>
     <div id="vue_detail">
-    <!-- 定义函数 -->
-        <h3>title : {{title}}</h3>
-        <h4>{{details()}}</h4>
-        <p> el 参数，它是 DOM 元素中的 id;<br>
-        data 用于定义属性，当前实例中 data对象中 能找到的 所有的属性：title;<br>
-        methods 用于定义的函数，可以通过 return 来返回函数值;<br>
-        {{}}用于输出对象属性和函数返回值。</p>
-    </div>
+      <h4>表达式</h4>
+  		<p v-text="detail + '---v-text指令中是个表达式(数据属性content、计算属性detail、methods方法details())'"
+  		></p>
+  		<p>{{detail}}---计算属性detail 插入表达式</p>
+  		<p>{{details()}}---methods方法details() 插入表达式</p>
+  		<h5>提高浏览器性能！（计算属性 > watch变量 > methods）</h5><br>
+          <p>1、el 参数，它是 挂载相应vue实例的 DOM元素的 id;<br>
+         2、data 用于定义 数据属性，当前实例中 data对象中 能找到的 所有的属性：title;<br>
+          3、methods 用于定义的函数，可以通过 return 来返回值;<br>
+         4、{{}} 用于输出 对象属性值 和 函数返回值。</p><br>
+    
+      <h4>Vue中数组操作方法</h4>
+      <p>1、直接 初始化 整个对象的引用</p>
+      <p>2、使用数组的 变异方法(push、pop、unshift、shift、splice、reverse)</p>
+      <p>3、Vue.set(vm.arra, 1, 'arra数组中下标为1元素已更改')</p>
+        <p>vm.$set(vm.arra, 1, 'arra数组中下标为1元素已更改')</p>
+      <p>arra数组为 : {{arra}}</p>
+    </div><br>
     <script type="text/javascript">
-    var json = {title: "vue"};
+    var json = {
+      title: 'hello',
+      content: 'world',
+      detail2: 'hello world',
+      arra: ['a', 'b']
+    };
         var vm = new Vue({
             el: '#vue_detail',
             data: json,
-            methods: { //定义函数
+      			computed: { //计算属性(有缓存机制，提高浏览器性能。构成属性不改变，便不会重新计算)
+                      detail: {
+      					get: function() {
+      						return  this.title + ' ' + this.content;
+      					},
+      					set: function (value) { // 需要初始化时执行，形如 detail = 'hello kity'
+      						var arr = value.split(' '); // 将字符串以' '为界打散为数组，形如[title, content]
+      						this.title = arr[0];
+      						this.content = arr[0];
+      					}
+      				}
+                  },
+      			watch: { // 监听detail2是否变化(有缓存机制，提高浏览器性能。构成属性不改变，便不会重新计算)
+      				title: function () {
+      					this.detail2 = this.title + ' ' + this.content
+      				},
+      				content: function () {
+      					this.detail2 = this.title + ' ' + this.content
+      				}
+      			},
+      			methods: { //定义函数
                 details: function() {
-                    return  this.title + " - 学的不仅是技术，更是梦想！";
+                    return  this.title + ' ' + this.content;
                 }
             }
         });
 
         if(vm.title === json.title){ //数据属性
-            document.write("vm.title 与 json.title 引用相同的对象！<br><br>");
+            document.write("<h5>vm.title 与 json.title 引用相同的对象！</h5>");
         }
 
         if(vm.$data === json && vm.$el === document.getElementById('vue_detail')){ //实例属性与方法,它们都有前缀 $
@@ -56,6 +91,7 @@
     </script>
 
 
+	<h4>(另区分 指令v-text)</h4>
     <h4>v-html</h4>
     <p>指令 是带有 v- 前缀的特殊属性;<br>
     指令 用于在表达式的值改变时，将某些行为应用到 DOM 上。</p>
@@ -67,7 +103,7 @@
         <input type="checkbox" v-model="use"> <!-- use为true，复选框被选中，下面的class-v-bind生效 -->
         <span>class : {{use}}</span>
         <!-- v-bind 指令被用来响应地更新 HTML属性【class，href，src等】 -->
-        <div v-bind:class="{'class-v-bind':use}">v-bind:class 指令</div>
+        <div v-bind:class="{'class-v-bind':use}">v-bind:class 指令(值为对象、或对象数组均可)</div>
         <!-- v-bind:class 可简化为 :class -->
     </div><br><br>
 
@@ -85,11 +121,12 @@
     </div><br><br>
 
     <h4>v-for</h4>
+	<h5>v-for迭代 对象(index下标、key键名、value键值)</h5>
     <ul id="v-for">
         <li v-for="(value, key, index) in object">{{ index }}. {{ key }} : {{ value }}</li>
     </ul><br>
 
-    <h5>v-for迭代整数</h5>
+    <h5>v-for迭代 整数</h5>
     <ul id="v-for-num">
     <li v-for="n in 5">{{ n }}</li>
     </ul><br><br>
@@ -184,22 +221,28 @@
         },
         reverseMessage: function (value) {
             value = value.toString();
-            return value.split('').reverse().join('');
+            return value.split('').reverse().join(''); // split打散为数组，reverse反转，join再把数组元素拼接为字符串
         }
       }
     })
     </script>
 
     <script type = "text/javascript">
-     var vm = new Vue({
+     var vv = new Vue({
         el: '#watch',
         data: {
-           counter: 1
+           counter: 1,
+           test: ['hah', 2]
+        },
+        watch: {
+          counter: function(New, Old) {
+            alert('计数器值的变化 :' + Old + ' 变为 ' + New + '!');
+          }
         }
      });
-     vm.$watch('counter', function(New, Old) { //实例属性 监听属性$watch
-        alert('计数器值的变化 :' + Old + ' 变为 ' + New + '!');
-     });
+     // vv.$watch('counter', function(New, Old) { //实例属性 监听属性$watch
+     //    alert('计数器值的变化 :' + Old + ' 变为 ' + New + '!');
+     // });
     </script>
     </body>
 </html>
