@@ -23,6 +23,16 @@
         </style>
     </head>
     <body>
+    <h4>生命周期 钩子函数</h4>
+    <ul>
+      <li>beforeCreate(实例 部分初始化)  created(实例 初始化完成)</li>
+      <li>beforeMount(数据 渲染到页面之前)  mounted(数据 渲染到页面之后)</li>
+      <li>beforeUpdate(数据 更改之前)  updated(数据 更改之后)</li>
+      <li>activated deactivated</li>
+      <li>beforeDestroy(实例 销毁之前 *调用vm.$destroy()销毁*)  destroyed(实例 销毁之后)</li>
+      <li>errorCaptured(捕获来自子孙组件的错误)</li>
+    </ul><br>
+
     <div id="vue_detail">
       <h4>表达式</h4>
   		<p v-text="detail + '---v-text指令中是个表达式(数据属性content、计算属性detail、methods方法details())'"
