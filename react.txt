@@ -1,0 +1,179 @@
+pureComponent
+
+setState
+
+生命周期
+-----------------------------------------------------------------------------------------
+
+hook不能放在if、for等语句中，必须放在函数组件内部的最顶层，
+
+【useState的作用，及状态的解构赋值】
+useState是用于在函数式组件中定义状态的。
+注意：
+1.useState(arg)返回一个 数组（包含2个元素）。返回数组的“首个元素”受 “arg数据类型”的 影响；第二个元素为 改变state的方法，如f()，不受影响。
+即useState(arg)中的arg，若为一个 简单数据类型（即有一个状态标志），返回数组的第一个元素便为 “简单数据类型arg”；若为一个对象（即有 多个状态标志），返回数组的第一个元素则为 “对象arg”。
+2.须通过const解构，不推荐 直接通过 “变量赋值”的形式改变 状态，要通过 调用“改变state的方法，如f()”改变状态。
+3.对象形式解构，属性名是“固定死”的；数组形式解构，属性名是“自定义”的。
+》当useState有 一个状态 时：
+ const [xxx, setXxx] = useState(false);
+ 不过通过 {} 解构数组 ，如const {0:xxx,1:setXxx} = [false,fn] 也不会报错【因 [false,fn] 等同{0:false,1:fn}】，也能将 “唯一状态值”赋值给 变量xxx，此为奇淫技巧，不推荐。
+//结果xxx===false, setXxx===fn
+
+改变xxx状态：setXxx(true);//结果xxx===true
+
+》当useState有 多个状态 时（包含flag、status）：
+》》使用一个useState（不推荐）
+const [xxx, setXxx] = useState({flag: true, status: 1});//结果xxx==={flag: true, status: 1}, setXxx===fn
+
+xxx是一个对象；
+将xxx中的状态解构出来、并赋值给flag、status 的骚操作，const {0:{flag,status},1:setXxx} = useState({flag: true, status: 1});
+//结果flag===true、status==1、 setXxx===fn
+
+改变flag状态：setXxx({flag: false, status: 1});//结果xxx==={flag: false, status: 1}
+
+》》（推荐）使用 多个useState，管理不同状态
+如，
+ const [flag, setFlag] = useState(false);
+ const [status, setStatus] = useState(1);
+
+
+---------------------------------------------------------
+
+【useEffect】
+函数式组件中没有生命周期的，使用useEffect可以模拟类组件中的生命周期。
+
+第一种写法：useEffect(callback)    一上来就会执行，后面不管是什么状态发生变化了，callback还是会执行的。
+第二种写法：useEffect(callback,[])  一上来就会执行，后面不客是什么状态发生变化了，callback都不会再执行了。
+第三种写法：useEffect(callback,[num])，一上来就会执行，后面只能num这个状态发生变化了，才会再次执行callback，其它状态发生变化了,callback不会执行。
+第四种写法：useEffect(function(){  return ()=>{}  },[num])   一上来，里面的小函数不会执行，当num发生变化了，先去执行里面的小函数，在小函数中获取的状态并不是最新的状态。
+//注意useEffect不能直接 async callback。可以通过一下方式：
+useEffect(
+  ()=>{
+    const cb = async()=>{
+      let res = await getData();
+    }
+    cb();
+  }
+)
+或者，
+useEffect(
+  ()=>{
+    getData().then(res=>{
+      //...
+    })
+  }
+)
+
+useEffect与useLayoutEffect的差异：
+对于useEffect，先进行 浏览器渲染和绘制真实DOM，然后执行useEffect中的callback。
+对于useLayoutEffect，会先阻塞 浏览器渲染和绘制真实DOM，待执行完毕useLayoutEffect中的callback，再渲染dom。应用场景不多
+
+
+---------------------------------------------------------
+
+【useRef】
+
+》前情提要：
+
+在“类组件”中，我们基于ref可以做什么：
+
+- 在标签上写ref，目的是为了获取DOM元素
+- 在类组件上写ref，目的是为了获取子组件实例，进而调用子组件中的属性和方法
+- 在函数组件上写ref，报错，函数组件中使用ref需要使用React.forwardRef实现ref转发，转发的目的是为了获取子组件中的DOM元素。
+
+在“类组件”中，ref的使用方式（注意这里的this指类组件实例）：
+
+- ref="box"      获取：this.refs.box 【不推荐！新版本react可能要废弃该方式；另外，函数式组件没有实例，无法使用这里的this】
+- ref={x=>this.box =x}   获取：this.box【若box定义在constructor(){}之外，指将当前对象挂载到 类组件原型对象的box公有属性上。之内，指将当前对象挂载到 类组件的box私有属性上】
+- this.box = React.createRef() 创建一个ref对象 （ <h1 ref={this.box}></h1>  获取：this.box.current获取DOM元素）
+
+》正题：
+
+》》【useRef(null)与React.createRef()的差异：】
+
+1.在“函数式组件”中，还可以通过useRef这个hook，来获取DOM元素或子组件实例。【useRef只能用于“函数式组件”，不能用于“类组件”】
+React.createRef可以在“函数式组件”或“类组件”中创建ref对象
+2.在“函数式组件”中，推荐使用useRef(null)，渲染效率高于React.createRef
+解释：当依赖数据更新时，每次执行函数式组件,
+function One(){
+ let box1 = React.createRef();//会重复创建新的React.createRef();
+ let box2 = useRef(null);//useRef(null)不会被重复创建
+ return(
+  <span ref={box1}></span>
+  <span ref={box2}></span>
+ )
+}
+
+》》【React.forwardRef转发。当在函数式子组件上使用ref时，子组件定义处使用React.createRef((props,ref)=>{}），可以获取子组件内部的“某个DOM元素”，注意：子组件为函数式组件，没有实例。】
+//子组件
+const Child = React.forwardRef((props, ref) => {
+  // 渲染逻辑
+  return (
+    <div ref={ref}>
+      {/* ... */}
+    </div>
+  );
+});
+//父组件
+function One(){
+ let box1 = React.createRef();//会重复创建新的React.createRef();
+ let box2 = useRef(null);//useRef(null)不会被重复创建
+ return(
+  <Child ref={box1}></Child>
+ )
+}
+
+
+-------------------------------------------------------------------
+
+【useImperativeHandle】与“React.forwardRef转发”搭配使用，可以 获取子组件内部的状态或方法
+
+//子组件
+const Child = React.forwardRef((props, ref) => {
+let [open] = useState("hhh")
+let fn = ()=>{}
+
+useImperativeHandle(){
+ return {open,fn}//这里返回的数据可以使父组件通过ref对象拿到
+}
+
+  // 渲染逻辑
+  return (
+    <div ref={ref}>
+      {/* ... */}
+    </div>
+  );
+});
+//父组件
+function One(){
+ let box1 = React.createRef();//会重复创建新的React.createRef();
+ let box2 = useRef(null);//useRef(null)不会被重复创建
+ return(
+  <Child ref={box1}></Child>
+ )
+}
+
+
+-------------------------------------------------------------------
+
+【useMemo】函数式组件中，使用useMemo把一个复杂的计算缓存起来，依赖值发生改变时才重新计算。
+如果在函数式组件，有消耗性能的计算，尽可能使用useMemo缓存起来，提高组件的更新速度。
+let sum  =useMemo(()=>{
+return num1+num2
+},[num1,num2])
+
+-------------------------------------------------------------------
+【useCallback】缓存“函数式组件”内部的函数声明，减少对空间的开辟，避免组件每次更新时都要重新声明。
+使用场景：父组件嵌套子组件时，父组件内部有一个函数，基于属性传递给子组件，此时传递的函数，可以基于useCallback缓存起来。
+function One(){
+ const fn = () => {};//避免组件每次更新时都要重新声明
+ return(//将函数体传递给 子组件
+  <Child fn={fn}></Child>
+ )
+}
+
+
+
+-----------------------------------------------------------------------------------------
+
+组件通信

@@ -1,0 +1,307 @@
+<?php 
+/*
+// 读取服务器中文件内容
+//首先采用“fopen”函数打开文件，得到返回值的就是资源类型。
+$file_handle = fopen("../ben.txt","r");
+if ($file_handle){
+    //接着采用while循环（后面语言结构语句中的循环结构会详细介绍）一行行地读取文件，然后输出每行的文字
+    while (!feof($file_handle)) { //判断是否到最后一行
+        $line = fgets($file_handle); //读取一行文本
+        echo $line; //输出一行文本
+        echo "<br />"; //换行
+    }
+}
+fclose($file_handle);//关闭文件
+*/
+?>
+
+<?php 
+echo "挺好玩的啊！"."<br><br><br>";
+
+// 单,双引号
+$DV = "I love you";
+echo "hello,'\$DV'" ."&nbsp;&nbsp;&nbsp;". "hello,'$DV'";echo "<br>";
+echo 'hello,"$DV"' ."&nbsp;&nbsp;&nbsp;". 'hello,"$DV"';echo "<br><br><br>";
+
+// 长字符串定义(字符串内部不允许有 空格符!!)
+$str = <<<GOD
+不知怎么哗啦啦啦啦，我摔了一身泥.
+GOD;
+echo $str."<br><br><br>";
+
+// 定义常量
+$p = "";
+define($p,3.14); echo "PI为：". constant($p) ."<br>";
+//另一种方式//define("PI",3.14); echo "PI为：". PI ."<br>";
+
+// 判断常量是否被定义
+echo defined($p) ."<br>";
+echo defined("PHP_OS") ."<br><br>";
+
+// 系统预处理常量
+echo PHP_OS."<br>".PHP_VERSION."<br>".__LINE__."<br>".__FILE__."<br><br><br>";
+
+// 数据类型
+var_dump(Array("ere","e22","我是数组")).var_dump("qqq").var_dump(222).var_dump(3.14).var_dump(true).var_dump(null);
+echo "<br><br><br>";
+
+
+// 表达式前加上@,隐藏可能的出错信息	
+$conn = @mysql_connect("localhost","username","password");
+ echo "出错了，错误原因是：" ."<br><br><br>";
+ 
+// 数组遍历
+$arr = array("我","是","数","组");
+foreach($arr as $r) {echo $r."&nbsp;";};echo "<br>";
+foreach($arr as $key => $r) {echo $key.":".$r."&nbsp;";};echo "<br>";
+print_r($arr);echo "<br>";
+echo "<br><br><br>";
+
+
+// 索引数组初始化的 3种方式
+//$arr_new = array("苹果");
+//$arr_new = array("0"=>"苹果");
+$arr_new[0] = "苹果";
+print_r($arr_new);echo "<br>";
+echo "<br><br><br>";
+
+
+// 初始化 二维数组
+$arr_double = array("我","很","傻",
+"呵呵哒"=>array("你",666=>"才","笨",12,"12")
+);
+// 返回二维数组 数据类型(详情)
+var_dump($arr_double);
+echo "<br>";
+
+
+// 根据键名 返回键值
+var_dump($arr_double['呵呵哒'][666]);
+
+// 根据键名 以数组形式 返回键值
+/*array_keys(array,value,strict) 函数返回 包含数组中所有键名的一个 新数组。
+如果提供了第二个参数，则只返回键值为该值的键名。
+如果 strict 参数指定为 true，则 PHP 会使用全等比较 (===) 来严格检查键值的数据类型。
+*/
+var_dump(array_keys($arr_double["呵呵哒"],"12",true));
+echo "<br>";
+
+
+// 四种输出方式(后2种都需要额外添加换行符。echo使用echo "<br>"; 或 ."<br>"均可; 而print_r()只能使用echo "<br>";方式)
+foreach($arr_double["呵呵哒"] as $w) {
+	var_dump($w);
+};
+foreach($arr_double["呵呵哒"] as $w) {
+	echo $w." ";
+};echo "<br><br>";
+print_r($arr_double["呵呵哒"]);echo "<br>";	// 数组 打印出Array([0]=>你[666]=>...
+print_r($arr_double["呵呵哒"][667]);echo "<br>"; // 数组元素 只打印出键值"笨"
+echo "<br><br><br>";
+
+
+
+echo '*****************************类与对象****************************'."<br>";
+
+echo '1./****修改对象属性的值 并输出.****/ '."<br>";
+//定义一个类
+class Car {
+    var $name = '汽车';
+    function getName() {
+        return $this->name;
+    }
+}
+//实例化一个car对象
+$car = new Car();
+$car->name = '奥迪A6'; //设置对象的属性值
+echo $car->getName();  //调用对象的方法 输出对象的名字
+echo "<br><br><br>";
+
+
+echo '2./****class中static方法重点****/ '."<br>".
+'<静态属性与方法可以在不实例化类的情况下调用，直接使用 类名：：方法名 的方式进行调用。
+静态属性不允许对象使用->操作符调用。'."<br>".
+'<静态方法中，$this伪变量不允许使用。可以使用self，parent，static在内部调用静态方法与属性。'.'<br>';
+class Car1 {
+    private static $speed = 10;   
+    public function getSpeed() {
+        return self::$speed; //静态属性
+    } 
+    //在这里定义一个静态方法，实现速度累加10
+    public static function speedUp() {
+    return self::$speed+=10;
+    }
+}
+$car = new Car1();
+Car1::speedUp();  //调用静态方法加速
+echo $car->getSpeed();  //调用共有方法输出当前的速度值
+echo "<br><br><br>";
+
+
+
+echo '3./****类和对象之访问控制****/ '."<br>".
+'<类属性 必须 定义为公有,受保护,私有之一。为兼容PHP5以前的版本,如果采用 var 定义,则被视为public。'.'<br>'.
+'<类中的方法 若没有 设置这些关键字之一，则该方法默认为public。'.'<br>'.
+'<如果构造函数定义成了私有方法，则不允许直接实例化对象了，这时候一般通过静态方法进行实例化。'.'<br>';
+class Car2 {
+    private function __construct() {
+        echo 'object create';
+    }
+    private static $_object = null;
+    public static function getInstance() {
+        if (empty(self::$_object)) {
+            self::$_object = new Car(); //内部方法可以调用私有方法，因此这里可以创建对象
+        }
+        return self::$_object;
+    }
+}
+//$car = new Car(); //这里不允许直接实例化对象
+$car = Car2::getInstance(); //通过静态方法来获得一个实例
+echo "<br><br><br>";
+
+
+
+echo '4./****类和对象之对象继承****/ '."<br>";
+class Car3 {
+    public $speed = 0; //汽车的起始速度是0
+    
+    public function speedUp() {
+        $this->speed += 10;
+        return $this->speed;
+    }
+}
+//定义继承于Car的Truck类
+     class Truck extends Car3 {
+        public function speedUp() {
+            $this->speed = parent::speedUp() + 50;
+        }
+    } 
+$car = new Truck();
+$car->speedUp();
+echo $car->speed;
+echo "<br><br><br>";
+
+
+echo '5./****类和对象之重载****/ '."<br>".
+'PHP中的重载指的是动态的创建属性与方法，属性的重载通过__set,__get,__isset,__unset来分别实现对不存在属性的赋值、读取、判断属性是否设置、销毁属性。'.'<br>'.
+'方法的重载通过__call来实现，当调用不存在的方法的时候，将会转为参数调用__call方法，当调用不存在的静态方法时会使用__callStatic重载。'.'<br>';
+class Car4 {
+    public $speed = 10;
+
+    //在这里使用重载实现speedDown方法
+    public function __call($name,$args) {
+        if($name == "speedDown"){
+        $this->speed -= 10;}
+    }
+}
+$car = new Car4();
+$car->speedDown(); //调用不存在的speedDown方法
+echo $car->speed;
+echo "<br><br><br>";
+
+
+echo '6./****类和对象之对象的高级特性****/ '."<br>".
+'>对象比较，当同一个类的两个实例的所有属性都相等时[2个new]，可以使用比较运算符==进行判断;
+当需要判断两个变量是否为同一个对象的引用时[1个new]，可以使用全等运算符===进行判断。'.'<br>'.
+'>对象复制，在一些特殊情况下，可以通过 关键字clone 来复制一个对象，这时__clone方法会被调用，
+通过这个魔术方法来设置属性的值。'.'<br>'.
+'>对象序列化，可以通过serialize方法将对象序列化为字符串，用于存储或者传递数据，
+然后在需要的时候通过unserialize将字符串反序列化成对象进行使用。'.'<br>';
+class Car5 {
+    public $name = 'car';
+    
+    public function __clone() {
+        $obj = new Car5();
+        $obj->name = $this->name;
+    }
+}
+$a = new Car5();
+$a->name = 'new car';
+$b = clone $a;
+var_dump($a,$b);
+if ($a == $b) echo '==';   //true
+if ($a === $b) echo '==='; //false
+echo "<br>";
+$str = serialize($a); //对象序列化成字符串
+echo $str.'<br>';
+$c = unserialize($str); //反序列化为对象
+var_dump($c);
+echo "<br><br><br>";
+
+
+
+echo '*****************************正则表达式****************************'."<br>";
+echo "1.经常使用的分隔符是正斜线(/)、hash符号(#) 以及取反符号(~)。"."<br><br>";
+
+echo "2.转义的两种方式："."<br>>反斜杠<br>  /http:\/\//".
+"<br>>或preg_quote  <br>      
+\$p = 'http://';  <br>
+\$p = '/'.preg_quote($p, '/').'/';"  ."<br><br>";
+
+echo "3.分隔符后 可使用模式修饰符(i, m, s, x等),i修饰符可忽略大小写匹配。"."<br>".
+"不区分大小写匹配\"BBC是英国的一个电视台\"中的BBC"."<br>";
+$str = "BBC是英国的一个电视台";
+if (preg_match('/bbC/i', $str)) {
+    echo '匹配成功'.'<br>';
+}
+
+
+
+echo '*********************PHP文件系统之读取文件内容********************'."<br>";
+
+echo "1.当前服务器目录 存在某文件与否,同file_exists()。另外is_readable(),is_writeable()判断可读写"."<br>";
+if(is_file("php_notes.php")){
+	echo "当前服务器目录 存在php_notes.php文件！";
+}else{
+	echo "php_notes.php不存在！";
+};echo "<br><br>";
+
+
+
+
+
+
+echo "2.对文件内容的读写（注意：[1].打开一次文件不能同时读写！
+[2].由于不同操作系统的 行结束符 有差异,要视情况在r,w,a等访问类型 后添加标记t或b）"."<br>".
+'
+>>"r"	只读方式打开，将文件指针指向文件头。<br>
+>>"r+"	读写方式打开，将文件指针指向文件头。(由左至右依此覆盖掉原内容，同一内容 不能重复写入)<br>
+>>"w"	写入方式打开，将文件指针指向文件头并将文件大小截为零。如果文件不存在则尝试创建之。(w,w+都是 删除原内容,写入新内容)<br>
+>>"w+"	读写方式打开，将文件指针指向文件头并将文件大小截为零。如果文件不存在则尝试创建之。<br>
+>>"a"	写入方式打开，将文件指针指向文件末尾。如果文件不存在则尝试创建之。(a,a+都是 在原内容尾部 添加新内容，同一内容 能重复写入)<br>
+>>"a+"	读写方式打开，将文件指针指向文件末尾。如果文件不存在则尝试创建之。<br><br>'.
+
+"[1]读取(访问类型只可能是r,r+,w+,a+)文件 原始内容:"."<br>";
+$con = "";
+$fp0 = fopen("wen.txt","rb");
+$con .= fread($fp0,filesize("wen.txt"));
+fclose($fp0);
+echo $con."<br>";
+
+echo "[2]更改(访问类型 除了r都可以)内容:"."<br>";
+$fp1 = fopen("wen.txt","w+b");
+fwrite($fp1,"2");
+fclose($fp1);
+echo "<br>";
+
+echo "[3]读取文件最新内容:"."<br>";
+$con = "";
+$fp2 = fopen("wen.txt","rb");
+//while(!feof($fp2)) {
+    $con .= fread($fp2,3000); //一次读取4096个字符
+//}
+fclose($fp2);
+echo $con."<br>";
+
+$filename = "新建文件夹";
+foreach(glob("*") as $filename){
+	unlink($filename);
+}
+rmdir("新建文件夹");
+
+
+echo filesize("php_notes.php");
+
+
+
+echo "<br><br><br>";
+?>

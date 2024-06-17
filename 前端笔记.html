@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>前端笔记</title>
+	<script type="text/javascript">
+		function openWindow() {
+			var mymessage = confirm("确定要打开新网页吗？");
+			var website;
+			if (mymessage == true) {
+				website = prompt("您要转向的网址？");
+				window.open('', '', 'width=200,height=100')
+				//window.open("http://"+website,'_blank','top=50px,left=100px,height=600px,width=700px');
+			}
+			else {
+				alert("您已取消 网页转向");
+			}
+		}
+
+
+		function checkall() {
+			var hobby = document.getElementsByTagName("input");
+			var checkbox = document.getElementsByName("hobby");
+			for (var i = 0; i < checkbox.length; i++)
+				checkbox[i].checked = true;// 任务1 
+		}
+		function clearall() {
+			var hobby = document.getElementsByName("hobby");
+
+			// 任务2    
+			var checkbox = document.getElementsByName("hobby");
+			for (var i = 0; i < checkbox.length; i++)
+				checkbox[i].checked = false;
+		}
+	</script>
+
+	<style>
+		/*【基本选择器】
+			类选择器（使用最多），id选择器，标签选择器（影响范围太大，建议在层级选择器中使用），
+			属性选择器(通过已经存在的属性名或属性值匹配元素)，通配选择器(效率最低，不推荐)！
+		【复合选择器】
+			层级选择器(子选择器，后代选择器)，组选择器(选择器列表)，兄弟选择器，通用兄弟选择器
+		【伪类选择器、伪元素选择器】*/
+
+		/*属性选择器 详解
+		a[title] 存在title属性的a标签
+		a[href="https://example.org"] href属性值为 https://example.org 的a标签
+		a[href*="example"] href属性值 包含example 的a标签。【a[href*="example" i],注意i、s前有空格！！默认为s，区分大小写。i 不区分大小写！补充，ol有序列表不需要大小写敏感标志】
+		a[href^="#"] href属性值 以'#'开头 的a标签
+		a[href$=".org"] href属性值 以'.org'结尾 的a标签
+		div[lang|="zh"] lang属性值为'zh'，或 前缀为 'zh-' 的div标签
+
+		【[attr~=value] attr属性值为 以 空格 作为分隔的 值列表，值列表中至少有一个值为 value！】
+		html代码：<div class="head head-top"></div>
+		css代码：div[class~="head"] 选中 class值中包含 head类 的div标签
+		*/
+
+
+		/*通用兄弟选择器 详解
+		【p ~ span{}，举例：以下结果只有span 2, span 3, span 4, Span 5, 和Span 5中的span 6 能被选中!】
+		解释: p,span (有同一个父元素)。在众多兄弟元素中，由p标签开始，由上向下，忽略中间所有 非span兄弟标签，直至遇到 1个 或 相邻的多个 span标签，以及它们的后代span标签，均选中。当遇到 新p标签，规则依旧，直至排查完所有兄弟标签！
+	html代码：   <span>span 1</span>
+				<p>p 1</p>
+				<code>code 3</code>
+				<span>span 2</span>
+				<span>span 3</span>
+				<div>div 1</div>
+				<p>p 2</p>
+				<h1>h 1</h1>
+				<span>span 4</span>
+				<p>p 3</p>
+				<span>Span 5
+					<span>Span 5中的span 6</span>
+				</span>
+		*/
+
+		/*相邻兄弟选择器 详解(有同一个父元素)
+	 	示例一：
+			h1 + p {margin-top:50px;}		紧接着h1 后的 第一个p
+			h1 + p + p {margin-top:50px;}	紧接着h1 后的 第二个p （p连着p）
+		示例二：
+			html代码：  <ul>
+						<li>One</li>
+						<li>Two!</li>
+						<li>Three</li>
+						</ul>
+			css代码：  li:first-of-type + li {color: red;} 第二个Two! 被选中！
+
+		【题外，li:first-of-type，由上到下选中 所有li兄弟元素的，第一个 li兄弟元素。】
+
+		【解释：选取所有位于li标签后的第一个li元素。第一个li前没有li，故不会被选中。第二个li前紧邻第一个li，第三个li前紧邻第二个li，故能选中第2个，第3个li】
+		li + li {font-weight:bold;}		选中 第2个，第3个li
+		li + li + li {font-weight:bold;} 同上，可选中 第3个li
+		*/
+
+		/*后代选择器【选择器1 选择器2 {}，选择器1 为祖先（父母，父母的父母，父母的父母的父母等）元素，选择器2为 所有 直系 后代！】
+		【示例结果，只有 A，B 被选中并标记为 circle】
+		示例html代码：<ul>
+						<li>
+							<div>Item 1</div>
+							<ul>
+								<li>A</li>
+							</ul>
+						</li>
+						<li>
+							<div>Item 2</div>
+							<ul>
+								<li>B</li>
+							</ul>
+						</li>
+					</ul>
+		示例css代码：
+			li {list-style-type: disc;}
+			li li {list-style-type: circle;}
+		*/
+
+		/*子选择器
+		【示例结果：div元素中的 所有 子代span元素（仅子代）被选中。html代码一中，只有 文本Span 1（非span元素）被标记为blue。孙代span元素仍为orange】
+		【css代码顺序不同，不影响html代码的结果！由于 div>span子代选择器的 优先级权重（为2个标签） 比 span标签选择器（为1个标签） 大】
+		html代码：<div>
+					<span>
+						Span 1
+						<span>Span 2</span>
+					</span>
+				</div>
+				<span>Span 3</span>
+		css代码：
+				span {background-color: orange;}
+				div>span {background-color: blue;}
+		*/
+
+		/*子代，后代选择器的 总结：
+		html>body table+ul {margin-top: 20px;}
+		【解释：html中的 子代body中的 所有 直系子孙代table后 紧邻的那个 ul】
+		*/
+
+		/*伪类选择器
+		【i:nth-child(n)与i:nth-of-type(n)区分：i:nth-child(n)选中与i同级的第n个 元素，而i:nth-of-type(n)只在筛选出的 同级的所有i中，选中第n个i元素】
+		:first-child
+			p:first-child {color: red;} 匹配第一个p
+			p>i:first-child {font-weight: bold;}匹配所有p元素中的第一个i元素
+			p:first-child i {color: blue;}匹配第一个p元素中的所有i元素
+		:first-of-type与:last-of-type同理。
+
+		【示例结果：div11,span11,em11,span22,和b11 被选中。:first-of-type也可单独作为通配选择器，选中 当前、或后代层级中，每一级，各种元素的 首次出现的标签！】
+		css代码： article :first-of-type {background-color: pink;}
+		html代码： <article>
+					<div>This `div11` is first !</div>
+					<div>This <span>nested `span11` is first</span> !</div>
+					<div>This <em>nested `em11` is first</em>,but this <em>nested `em` is last</em> !</div>
+					<div>This <span>nested `span22` gets styled</span> !</div>< !--在当前层级内部，span首次出现-->
+					<b>This `b11` qualifies !</b>
+					<div>This is the final `div`.</div>< !--div11之前已出现-->
+				</article>
+		*/
+		.text {
+			border: 1px solid black;
+			/* 【注意：
+			1.元素border 连写 必须 设置border-width与border-style，不然无法显示！另外，border 分开写 必须指定border-style
+			2.只有以'font-'为前缀的，和color字体,以及text-align,line-height,white-wrap等 文本相关属性，才默认会 被后代元素 继承！
+			3.h元素不要继承祖先样式，要自定义font属性
+			】
+			*/
+			width: 400px;
+			color: orange;
+
+			font: bold italic 24px/30px arial, "微软雅黑";
+			/*
+/*复合样式font:font-weight font-style font-size(px)（必需）/line-height(px)  font-family（必需）;   两个 必需 属性的位置前后不能换*/
+			font-weight: bold;
+			/*字体着重：bold,normal 或100-900*/
+			font-style: italic;
+			/*斜体 样式:,italic,normal*/
+			font-size: 24px;
+			/*字体大小*/
+			line-height: 30px;
+			font-family: arial, "微软雅黑";
+			/*分别设置英文，中文 字体*/
+			text-align: left;
+			/*文本对齐方式left,right,center*/
+			text-decoration: line-through;
+			/*underline下划线,overline上划线,line-through贯穿线,none*/
+			text-indent: 2em;
+			/*文本首行缩进*/
+			letter-spacing: 12px;
+			/*重定义单个 字 或 字母 后的 间隙大小*/
+			word-spacing: 20px;
+			/*重定义所键入空格 的 空格长度*/
+			white-space: normal;
+			/*nowrap强制不换行,默认normal(英文或数字不结束不换行)*/
+			word-break: normal;
+			/*词内换行：break-word(强制换行),break-all(强制换行+把所有的 回车符 变成 空格符)，默认normal(英文或数字不结束不换行)*/
+		}
+
+		.ul {
+			/* 无序列表变有序列表 */
+			list-style-type: decimal-leading-zero;
+			/*默认 实心圆disc,无none,实心方square...*/
+			list-style-position: inside;
+			/*默认outside*/
+		}
+
+		.ul>li:last-child {
+			/*.ul的 最后一个子代li*/
+			background: red;
+			width: 60px;
+			list-style-image: url(http://www.w3school.com.cn/i/eg_arrow.gif);
+		}
+
+		dd {
+			list-style-image: url(http://www.w3school.com.cn/i/eg_arrow.gif)
+		}
+
+		table {
+			border-collapse: collapse;
+			/* [推荐此种,最细]相当于1条线。*/
+			border-spacing: 0;
+			/* 稍细!完全等同于<table>属性cellspacing="0",相当于2条线并列中间无间隙。table中默认为2px */
+
+			empty-cells: hide;
+			/* 去掉 空单元格的表框(border-collapse:collapse;由于是1条线故无影响) */
+			color: blue;
+			border: 1px solid blue;
+			/* 1px时表示所有内外边,大于1px只会影响最外边 */
+		}
+
+		table th,
+		table td {
+			width: 150px;
+			/* 使列等宽,必须限制 */
+			padding: 10px;
+			/* 等同于<table>属性cellpadding="10px",推荐使用该<table>属性 */
+		}
+
+
+		/* float */
+		.float-r {
+			background: green;
+			margin: 0 auto;
+			width: 200px;
+		}
+
+		.p1 {
+			float: left;
+			background: gray;
+		}
+
+		.p2 {
+			width: 120px;
+			background: purple;
+		}
+
+
+
+		.fixed1 {
+			width: 300px;
+			height: 160px;
+			outline: #00FF00 ridge thick;
+			/*轮廓以突出元素outline-color,outline-style,outline-width,outline-offset(正数外扩，负数内扩。不占空间)*/
+			outline-offset: -40px;
+			position: fixed;
+			/*定位：div悬浮(fixed可在浏览器窗口以外隐藏而不出现滚动条！除relative外，fixed和absolute都会使元素 脱离文档流!relative还会同时保留之前的位置)。float可脱离文档流,可环绕元素而不能遮盖。脱离文档流的元素找不到边界,故不能类似于margin:0 auto;*/
+			/* 只要有 定位属性,该元素就默认为block级元素。z-index起作用前提必须有定位属性*/
+			left: 150px;
+			/*数值 或 百分比，水平竖直位置不能合并写！*/
+			top: 30px;
+			font: bold italic 24px/60px '微软雅黑';
+			text-align: center;
+			/*文本水平对齐：居中*/
+			text-transform: capitalize;
+			/*capitalize首字母大写，uppercase大写，lowercase小写*/
+			background-position: center 0;
+			/*背景图片上移。background-position: 0 0, 30px 30px; 左上角0 0，右下角30px 30px（也可 百分比混用）*/
+			background-repeat: no-repeat;
+			background-size: contain;
+			background-image: url(https://www.baidu.com/img/bd_logo1.png);
+			transform: rotate(10deg);
+			/*顺时针旋转到60度*/
+			border: 1px solid #ff0000;
+			/*z-index: 1; */
+		}
+
+		.banner {
+			height: 600px;
+			width: 840px;
+			margin: 50px auto;
+			/*上下为0px，左右居中显示。右显示margin-left:auto;左显示margin-right:auto;	*/
+			background-color: red;
+			background-position: 50% 50px;
+			/*数值，百分比，位置（left,right,top,bottom,center）。两个值分别代表 水平和纵向。一个值代表水平，默认纵向center*/
+			background-size: 30% auto;
+			/*contain等比例伸缩 至宽或高与容器相等(应用结果:图像小于等于容器)、cover等比例伸缩 至背景图像或其一部分 覆盖完整个容器(图像大于等于容器)、100% auto图像宽为 容器宽，比例不变【cover似100% (auto)或auto 100%,cover效果好】*/
+			/* 【html,body宽度默认为浏览器页面宽。容器为html或body时,cover容器高度可以为0】[不固定数值 才能随窗口伸缩] */
+			background-repeat: no-repeat;
+			border-top: 2px solid blue;
+			background-image: url(https://www.baidu.com/img/bd_logo1.png);
+			/*显示 背景 之前必须 设置好width height*/
+			background-attachment: fixed;
+			/*背景图片随 滑动条移动，默认值scroll*/
+		}
+
+		.dad {
+			width: 1388px;
+			height: 192px;
+		}
+
+		.dad-left {
+			float: left;
+			height: 192px;
+			width: 1096px;
+		}
+
+		.dad-right {
+			float: left;
+			margin-top: 15px;
+			height: 177px;
+			width: 80px;
+		}
+
+		.mav,
+		.mav0,
+		.mav1,
+		.mav2,
+		.mav3 {
+			/*组选择器*/
+			float: left;
+			height: 150px;
+			width: 150px;
+			margin: 15px;
+		}
+
+		.mav1 {
+			/*float属性 实现了水平显示多个 div*/
+			border-width: 3px 6px 9px 12px;
+			border-color: brown rgb(0, 255, 0) #000 blue;
+			border-style: solid dashed dotted solid;
+		}
+
+		.mav2 {
+			border-width: 3px 6px 9px;
+			border-color: brown rgb(0, 255, 0) #000;
+			border-style: solid dashed dotted;
+			/*实线（推荐solid 兼容性强），虚线，点划线*/
+		}
+
+		.mav3 {
+			border-width: 3px 6px;
+			border-color: brown rgb(0, 255, 0);
+			border-style: solid dashed;
+		}
+
+		.mav {
+			/*（推荐），四边样式相同 最常用*/
+			margin-left: 80px;
+			border: 3px brown solid;
+		}
+
+		.mav0 {
+			margin-left: 80px;
+			border-top: 3px brown solid;
+			border-right: 6px rgb(0, 255, 0) dashed;
+			border-bottom: 9px #000 dotted;
+			border-left: 12px blue solid;
+		}
+
+		.triangle,
+		.triangle1,
+		.triangle2,
+		.triangle3 {
+			width: 0px;
+			height: 0px;
+		}
+
+		.triangle {
+			border: 20px white solid;
+			border-top-color: blue;
+		}
+
+		.triangle1 {
+			border: 20px white solid;
+			border-right-color: brown;
+		}
+
+		.triangle2 {
+			float: left;
+			border: 20px white solid;
+			border-bottom-color: black;
+		}
+
+		.triangle3 {
+			float: left;
+			border: 20px white solid;
+			border-left-color: red;
+		}
+
+		/*锚伪类
+		【注意 先后顺序：a:link, a:visited, a:hover, a:active】
+		*/
+		a:link {
+			/*href值为''或 # 时，没有默认blue色*/
+			color: #FF0000
+		}
+
+		/* 未访问的链接 */
+		a:visited {
+			/*只能重置color属性,不推荐更改！！*/
+			color: #00FF00
+		}
+
+		/* 已访问的链接 */
+		a:hover {
+			color: #FF00FF
+		}
+
+		/* 鼠标移动到链接上 */
+		a:active {
+			color: #0000FF
+		}
+
+		/* 选定的链接 */
+		/*focus 的使用*/
+		input:focus {
+			background-color: green;
+			box-shadow: 0 0 15px yellow;
+		}
+
+		textarea:focus {
+			background-color: orange;
+		}
+
+		/*伪元素 
+		(css3中，为区分 伪元素 与 伪类，使用了'::'替代':',平时使用':'也可。)
+		【注意：:first-line与:first-letter只能 应用于 块级元素】*/
+		p:first-letter {
+			/*首字母 大号 红色*/
+			color: red;
+			font-size: xx-large;
+		}
+
+		p:first-line {
+			/*首行 小号大写 蓝色*/
+			color: blue;
+			font-variant: small-caps;
+		}
+
+		h1:before {
+			/*在元素的内容之前插入新内容*/
+			content: url(https://ss0.bdstatic.com/k4oZeXSm1A5BphGlnYG/icon/weather/aladdin/png_18/a0.png);
+		}
+
+		h2:after {
+			/*在元素的内容之后插入新内容*/
+			content: url('https://ss0.bdstatic.com/k4oZeXSm1A5BphGlnYG/icon/weather/aladdin/png_18/a0.png');
+		}
+
+		.index-menu {
+			position: relative;
+			border-top: 4px solid #f34949;
+		}
+
+		.index-menu .tips {
+			position: absolute;
+			left: 50%;
+			top: 0;
+			margin-left: -78px;
+			width: 156px;
+			height: 75px;
+			text-align: center;
+			line-height: 65px;
+			background: #f34949;
+			color: #fff;
+		}
+
+		.index-menu .tips:after {
+			position: absolute;
+			left: 0;
+			bottom: 0;
+
+			content: '';
+
+			width: 0;
+			height: 0;
+			border-left: 78px solid transparent;
+			border-right: 78px solid transparent;
+			border-bottom: 10px solid #fff;
+		}
+	</style>
+</head>
+
+<body>
+	<!-- img、input元素, 可直接预先设置width等属性，为 inline-block ！ -->
+	inli
+
+	<h1>标题1</h1>
+	<h2>小<span style="color:red">标题</span></h2>
+	<hr />
+	<h3>i love you</h3>
+	<!-- 逻辑元素<strong><em>比物理元素<b><i>更能被SEO识别 -->
+	<div class=banner onclick="this.style.background='rgba(100,200,55,0.3)'"></div>
+	<!--this.style.后只能是width,hight,background等单词，单词中间不能有 连接符如"-"-->
+	<!--rgba中的a 表示 透明度-->
+
+	<div class="dad">
+		<div class="dad-left">
+			<div class="mav1"></div> <!--选择边框的某一属性【width color style】，同时为四条边赋值-->
+			<div class="mav2"></div>
+			<div class="mav3"></div>
+			<div class="mav"></div>
+			<div class="mav0"></div> <!--选择边框的某一条边，同时为边框的三个属性【width color style】赋值-->
+		</div>
+		<div class="dad-right">
+			<div class="triangle"></div>
+			<div class="triangle1"></div>
+			<div class="triangle2"></div>
+			<div class="triangle3"></div>
+		</div>
+	</div>
+
+	<div class="text">我是一个 粉 刷匠，粉刷本领强。Just do it! Lorem ipsum dolor sit,
+		amet consectetur adipisicing elit. Itaque magni necessitatibus ab labore officiis.
+		In reprehenderit magnam labore sapiente quidem harum,
+		numquam modi esse alias doloribus? Suscipit ipsum quae veniam.</div>
+	<div style="font:30px arail,'微软雅黑'">asdfgseghwer花开束带结发</div>
+
+	<div class="float-r">
+		<p class="p1">我 左浮动</p>
+		<p class="p2">我是float的兄弟段落，宽120px，是我顶开了父div</p>
+	</div>
+
+
+	<div class="fixed1">big bong</div>
+
+
+	<!-- 【注意：】 ul,ol的子标签必须为 li标签 ！！！ -->
+	<ul class="ul"> <!--无序列表-->
+		<li>q2erwer</li>
+		<li>阿瓦尔说的提高</li>
+		<li>阿萨德发</li>
+	</ul>
+	<ul>
+		<li>q2erwer</li>
+		<li>阿瓦尔说的提高</li>
+		<li>阿萨德发</li>
+	</ul>
+	<ol type="i" start="2"> <!--有序列表type值为（1,a,A,i,I）-->
+		<li>q2erwer</li>
+		<li>阿瓦尔说的提高</li>
+		<li>阿萨德发</li>
+	</ol>
+	<dl> <!--自定义列表 适合 图文混排！-->
+		<dt><b>他</b>功夫<strong>大使馆</strong></dt><!--加粗标签：<b>，<strong>-->
+
+		<dd>q2erwer</dd>
+		<dd><i>阿瓦尔</i>说的提高</dd> <!--斜体标签：<i>，<em>-->
+		<dd><em>阿萨德</em>发</dd>
+	</dl>
+
+	<table border="1" cellpadding="0" cellspacing="0" width="600" align="center" summary="表格摘要">
+		<!-- 表格外边框的宽(属性border无或为0时table内外均无边框),单元格边框与其内容之间的空白(影响四周padding),单元格之间的空白,表格的宽,表格摘要 -->
+		<!-- 		table中文本默认align值为left,valign值为center，靠左，垂直居中！-->
+		<caption align="bottom">表格 大标题</caption>
+
+		<colgroup style="background:red;">
+			<!-- 单标签<col>须与<colgroup>同时使用 -->
+			<col span="1"><!-- 第1列默认red -->
+			<col span="2" style="background:yellow;"><!-- yellow覆盖掉第2，3列的red -->
+			<col span="1" style="background:#ccc;"><!-- #ccc覆盖掉第第4列的red -->
+		</colgroup>
+
+		<thead>
+			<tr>
+				<th>小标题1</th>
+				<th>小标题2</th>
+				<th>小标题3</th>
+				<th>小标题4</th>
+				<th>小标题5</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>正文1-1</td>
+				<td>正文1-2</td>
+				<td colspan="2" align="right">我是正文1-3，我合并了1-4</td>
+				<td>正文1-5</td>
+			</tr>
+			<tr align="right">
+				<td>正文2-1</td>
+				<td></td>
+				<td>atgratery</td>
+				<td>513542365</td>
+				<td>12314</td>
+			</tr>
+			<tr>
+				<td rowspan="2" valign="bottom">正文3-1</td>
+				<td>134235</td>
+				<td>atgratery</td>
+				<td>513542365</td>
+				<td>12314</td>
+			</tr>
+			<tr>
+				<td>4-1被3-1合并,我是正文4-2</td>
+				<td>atgratery</td>
+				<td>513542365</td>
+				<td>atgratery</td>
+			</tr>
+		</tbody>
+		<tfoot>
+			<tr>
+				<td>尾部1-1</td>
+				<td>总计:</td>
+				<td colspan="2"><!-- 数据表 总数等 --></td>
+			</tr>
+		</tfoot>
+	</table>
+
+	<a href="https://www.baidu.com/img/bd_logo1.png" target="_self" alt="加载失败显示文字" title="这是一个链接">阿斯蒂芬jaw</a>
+	<img src="https://www.baidu.com/img/bd_logo1.png" title="这是一个图片" alt="加载失败显示文字" />
+	<div style="width:500px;">
+		<!--type:文本text 密码框password 单选radio 复选checkbox 上传文件file 重置reset-->
+		<form action="file:///C:/Users/lenovo/Desktop/百度首页.html" method="get">
+			用户名：<input type="text" name="username">
+			密码：<input type="password" name="password">
+			<input type="submit" value="提交"><br>
+			性别：<input type="radio" name="sex" value="male">男
+			<input type="radio" name="sex" value="female">女
+			<br>
+			<input type="checkbox" name="hobby" value="pingpong">乒乓
+			<input type="checkbox" name="hobby" value="basketball">篮球
+			<input type="checkbox" name="hobby" value="football">足球
+			<input type="checkbox" name="hobby" value="paiqiu">排球
+			<br>
+			<input type="button" value="全选" onclick="checkall();">
+			<input type="button" value="全不选" onclick="clearall();">
+			<br>
+			请选择上传文件：<input type="file" name="file"><br>
+			<input type="reset"> <br>
+			学历：<select style="width:200px" name="select" multiple="multiple" size="3">
+				<option value="1">小学</option>
+				<option value="2">初中</option>
+				<option value="3">高中</option>
+				<option value="4">大学</option>
+			</select><br>
+			评论：<textarea name="textarea" rows="3" cols="20" placeholder="这里输入评论" maxlength="30"></textarea>
+			生日: <input type="date" name="bday">
+			<input type="submit"><br>
+			<input type="button" value="打开新网页" onclick="openWindow()">
+		</form>
+		<a
+			href="mailto:1260750674@qq.com?cc=z1260750674@gmail.com;1966822136@qq.com&subject=Who%20am%20I&body=你%20是%20个%20好人">点击发送邮件</a>
+	</div><br>
+	<p>you can combine the :first-letter and :first-line pseudo-elements to<br> add a special effect to the first letter
+		and the first line of a text!</p>
+
+	<div class="index-menu">
+		<div class="tips">the menu</div>
+	</div> <br><br><br>
+	<a href="#">我是a标签<div>我是div<p>我是P</p>
+		</div></a>
+
+	<br><br>
+	<b>*div的高度是由line-height决定的（这也是表象，本质上是由 内容区域高度 和 行间距 共同决定的）！与字体大小 无关（放大观察这两个div）<br>
+		*line-height = 内容区域高度 + 行间距*&nbsp;&nbsp;&nbsp;&nbsp;（内容区域高度 只与字号 及字体 有关，当设定 行高 < 内容区域高度 时，行间距
+			为负值。simsun字体下，内容区域高度=字号）<br>
+			*行间距 实际上是以 内容区域顶、底部的 两个 半行间距 的形式出现的！<br>
+			*前端界面 行高一般为20px，考虑到兼容问题，font：14px/1.4286 arial;*</b>
+	<br><br><br>
+	<span>字号36px，行高0，撑不开div</span><br><br>
+	<div style="font-size: 36px;line-height: 0;border: 1px solid gray;background-color: purple;">alpha</div><br><br>
+	<span>字号0，行高36px，能撑开div</span><br><br>
+	<div style="font-size: 0;line-height: 36px;border: 1px solid lightgray;background-color: yellow;">alpha</div>
+	<br><br>
+
+
+	<br><b>*四种 盒子</b><br>（包含盒子：最外层div、行框盒子： div中的两行分别是两个 行框盒子、内联盒子：【em标签等内联元素、匿名内联盒子：即文字所在的位置】、内容区域：文字所在的位置）*</br>
+	<div style="border: 1px solid #555;">这是第一行文字<br>这是第二行文字，含有一个<em>em</em>标签</div>
+	<br><br><br><br>
+	<pre>空div都是relative<br>
+	<b>结论1.</b>absolute单独出现(无top,left等),要以之前兄弟级的relative（或文档流[忽视文档流中兄弟级的absolute]）为参照进行定位。<i>补充:单独的absolute可出现在文档流中,多个absolute可覆盖,不会占据空间</i><br>
+	<b>结论2.</b>absolute出现(有top,left等),要以 浏览器（或父级relative）为参照。<br>
+	<b>结论3.</b>relative只要出现(有或无top,left等),规则同 结论1.
+</pre>
+	<!-- <div style="color:gray;text-align:right;position: relative;"> -->
+	<div style="color:gray;text-align:right;">
+		<div style="width:300px;height: 150px;position: relative;background: black; ">0</div>
+		<div style="width:280px;height: 130px;position: absolute;background: red; ">absolute1</div>
+		<div style="width:125px;height: 115px;position: relative;background: blue; ">2</div>
+		<!-- <div style="width:210px;height: 90px;position: absolute;left: 20px;top: 20px;background: yellow; " >absolute3</div> -->
+		<div style="width:210px;height: 90px;position: absolute;background: yellow; ">absolute3</div>
+		<div style="width:160px;height: 80px;position: absolute;background: orange; ">absolute4</div>
+		<div style="width:90px;height: 75px;position: relative;background: green; ">5</div>
+		<div style="width:150px;height: 65px;position: absolute;background: purple; ">absolute6</div>
+		<div style="width:80px;height: 50px;position: relative;background: black; ">7</div>
+		<div style="width:60px;height: 40px;position: relative;background: red; ">8</div>
+	</div>
+	<br><br>
+
+
+	<iframe frameborder="0" width="800px" height="200px" src="http://www.baidu.com">
+		<frame />
+		<frame src="frame_b.htm" />
+		<frame src="frame_c.htm" />
+	</iframe>
+
+
+	<!--节点（nodeName nodeType nodeValue） 练习-->
+	<div id="con">
+		<p style="color:red;" id="p_id">javascript</p>
+		<div id="div_id">jQuery</div>
+		<h5 id="h5_id">PHP</h5>
+	</div>
+
+	<script type="text/javascript">
+		var x = document.getElementById("con");
+		for (var i = 0; i < x.childNodes.length; i++) {
+			//<div id="con">中元素节点的 节点详情（nodeName nodeType nodeValue）
+			document.write(x.childNodes[i].nodeName + "<br>" + x.childNodes[i].nodeType + "<br>" + x.childNodes[i].nodeValue + "<br><br>");
+			//<div id="con">中属性的 节点详情（nodeName nodeType nodeValue）
+			document.write(x.childNodes[i].attributes[0].nodeName + "<br>" + x.childNodes[i].attributes[0].nodeType + "<br>" + x.childNodes[i].attributes[0].nodeValue + "<br><br>");
+			//<div id="con">中文本节点的 节点详情（nodeName nodeType nodeValue）
+			document.write(x.childNodes[i].childNodes[0].nodeName + "<br>" + x.childNodes[i].childNodes[0].nodeType + "<br>" + x.childNodes[i].childNodes[0].nodeValue + "<br><br>");
+		}
+		//document.write(x.childNodes[0].childNodes[0].nodeValue + "<br>");
+		//document.write(x.childNodes[0].innerHTML + "<br>");
+		//document.write(x.childNodes[0].getAttribute("id")+"<br>");
+		//document.write(x.childNodes[0].attributes[0].nodeName + "<br>");
+		document.write(document.nodeName + document.nodeType + document.nodeValue + "<br>");
+	</script>
+	<script type="text/javascript">
+		var my = document.createElement('a');
+		my.id = 'jikey';
+		my.href = '#';
+		var text = document.createTextNode('this is a');
+		my.appendChild(text);
+		document.body.appendChild(my);
+		my.onclick = function () {
+			alert(this.id);
+		}
+	</script>
+
+	<br><br><br><br><br><br><br><br><br><br>
+</body>
+
+</html>

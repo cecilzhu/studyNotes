@@ -1,0 +1,1095 @@
+【区分 函数定义，函数声明，函数表达式，函数体：】
+
+》函数定义：包括 函数声明 和 函数表达式。函数声明是一种函数定义的方式，其中函数名在定义时是必需的。函数表达式是另一种方式，它可以是匿名的（没有名称）或具名的（有名称）。
+// 函数声明（其中 function 关键字 来定义函数，后面跟着 函数的名称 和 参数列表， '{return x + y;}'就是 函数体）
+function add(x, y) {
+    return x + y;
+}
+
+// 函数表达式（函数表达式整体 不会被提升，但变量名const add会提升；只有在赋值表达式执行时才会创建函数。）
+const add = function(x, y) {
+    return x + y;
+};
+
+》》函数表达式 类别：
+具名、匿名函数表达式，，箭头函数表达式，生成器函数表达式，立即执行函数（IIFE，是一种无“=”号的函数表达式；在“其声明的位置，函数定义时” 立即执行）
+
+
+【微任务与宏任务：】
+
+微任务：new Promise().then
+宏任务：setTimeout,setInterval，事件处理程序，xhr请求，I/O操作
+
+
+----------------------------------------------------------
+
+一、var,let,const 注意点、及区别：
+【var】
+1.var关键字创建的变量，和function具名函数 都会有“变量提升”的特点；
+2.没有var关键字声明就使用的变量 为挂载在window对象上的全局变量，不会变量提升，作为局部变量必须var关键字声明。
+3.局部变量不会挂载在Go上。
+【let】
+1.使用let创建的变量，不赋值就不会被初始化！未赋值就访问不会像var一样默认undefined，而是直接 报错“未初始化”；
+2.使用let声明的变量不会挂载到window上；而是在script中形成了一个 块级作用域，可以在该作用域中直接使用。
+3.使用let声明的变量不能重复声明；
+4.let和{}会形成一个块级作用域（块级作用域只适用于一片范围）
+【const】
+1.不能改变值（指的是栈空间内值不能被改变）；
+2.const 声明的时候 必须赋值 不赋值会报错；
+
+3.const声明不会提升；
+4.不会挂载在window上；而是在script中形成了一个 块级作用域，可以在该作用域中直接使用。
+5.const声明的 和{}会形成块级作用域
+
+【暂时性死区TDZ】
+在使用 let 或 const 声明变量时，变量在声明之前的阶段处于不可访问的状态。这个状态在变量声明被提升的同时创建，并持续到变量实际声明的时候。
+主要特征：
+1.提升但未初始化：在 TDZ 中，变量已经存在于作用域中，但尚未被初始化为任何值。而var 声明的变量会在提升阶段被自动初始化为 undefined。
+if (true) {
+    console.log(x); // 报错：ReferenceError，x 在 TDZ 中
+    let x = 10; // 在块级作用域内声明 x
+}
+
+2.块级作用域：块级作用域内使用 let 或 const 声明的变量只在该块级作用域内可见，不会影响外部作用域中具有相同名称的变量。
+
+let x = 10; // 全局作用域中的 x
+if (true) {
+    let x = 20; // 块级作用域内的 x，不影响外部作用域的 x
+    console.log(x); // 输出 20
+}
+console.log(x); // 输出 10，仍然是全局作用域中的 x
+
+
+
+【if条件语句 对 函数声明 的影响：】
+当 具名函数 声明在if语句中，条件为true时，函数声明 被提升到 全局作用域；条件为false时，在提升阶段，函数声明 foo 仍然会被提升到全局作用域（window对象上），但它的值为 undefined，因为没有为函数提供定义。
+if(){
+  function foo(){}
+}
+即在实践中，最好避免在条件语句内部使用函数声明，推荐使用函数表达式来替代。
+
+
+二、this显式绑定中的 call、apply、bind的区别：
+示例：
+        function gn(a, b) {
+            console.log(this);
+            console.log(a, b);
+        }
+        var obj = {
+            name: 'wang'
+        }
+gn.call(obj, 1, 2);
+gn.apply(obj, [1, 2])
+
+call与apply
+相同点：可以改变gn中的this一次，让其指向obj；并且会立即执行函数。
+不同点：对gn的传参方式不同。
+call(obj, n1,n2,n3...),
+apply(obj, [n1,n2,n3...])
+
+bind特点：会返回一个新的已绑定好的this的函数，不会立即执行函数。
+函数表达式 let newGn = gn.bind(obj, 1);
+newGn是个新函数，它的this指向obj。当通过 newGn() 调用时，默认传入的实参为1
+
+
+
+    <script>
+        // this指向特殊情况
+        function gn() {
+            console.log(this);
+        }
+        gn.call('hello')  //string
+        gn.call(1)  //number
+        gn.call(undefined)  //window
+        gn.call(null)  //window
+    </script>
+
+
+【关于this指向的总结：
+一、this绑定的 4 种 方式：
+1.默认（函数独立调用时）、
+2.隐式（对象 通过打点，即属性访问运算符'.'调用自身方法，默认指向调用该方法的 对象）、
+3.显式（call，aplly，bind）、
+4.new 绑定
+
+二、this指向绑定的优先级: [new绑定 > 显式 > 隐式]
+
+
+三、this指向window的 2种 情况！！！
+1.立即执行函数中（外层直接暴露的this，内层不一定）
+2.函数不是对象自身的方法。不是通过“打点（通过'.'属性访问符）”调用，而是自身独立调用时,如 fn()。
+
+其它 this的指向规律：
+1.一般情况下，谁调用 指向谁【即 对象调用自身的 某方法时】。如 obj.fn()指向obj；
+2.new绑定时，this指向 new出的 实例化对象（可能是new后的整个构造函数）！
+3.箭头函数的 this 是静态的，它会捕获外层函数作用域中的 this 值，即便通过call等显式绑定也无法被改变或覆盖其this指向。
+箭头函数设计为在捕获外层函数的上下文中工作，通常用于避免 this 指向的问题。
+
+const myObject = {
+  data: [1, 2, 3],
+  [Symbol.iterator]: function () {
+    let index = 0;
+
+    return {
+      next: () => {
+        // 箭头函数是在{ next: ... } 这个对象字面量内部定义的，内部this指向与{ next: ... }对象调用无关！直接继承自外层的[Symbol.iterator]函数作用域指向myObject。
+       // 若不是箭头函数，而是next(){}，则会指向调用者{ next: ... }对象。
+        if (index < this.data.length) {
+          return { value: this.data[index++], done: false };
+        } else {
+          return { value: undefined, done: true };
+        }
+      },
+    };
+  },
+};
+
+
+
+
+
+
+
+
+
+
+
+函数调用错综复杂，要具体情况具体分析。。
+要注意区分：
+函数调用,如 gn()、
+函数引用（即函数地址）的 赋值，如 var gn = fn。
+】
+
+【箭头函数特点（箭头函数本身没有this关键字，而下面都涉及到this）】
+1.不能作为构造器 
+2.给原型对象添加方法的时候不能使用箭头函数
+3.箭头函数 没有 显式原型对象
+
+三、原型链 与作用域链
+【原型链】
+对象通过__proto__，向外层层寻找 公有属性或方法的过程
+【作用域链】
+由函数声明处，向外层层寻找 变量的过程
+
+
+四、关于'...'是拓展（展开）运算符，还是 rest运算符
+【拓展（展开）运算符】
+》1.拼接数组（‘...’在赋值运算符‘=’的右侧）
+const arr1 = [2, 4, 21]
+const arr2 = ['hell', '你好']
+const arr = [...arr1, ...arr2]
+console.log(arr); //输出结果： [2, 4, 21, "hell", "你好"]
+
+》2.'...arr'作为 函数调用时的 实参；
+
+》3.浅拷贝 数组、对象
+
+》》》》》》》》》》》》》》》》》》》》》》》》》》》》补充：
+深拷贝,浅拷贝,引用拷贝，三者有什么区别?
+引用拷贝：只是复制对象的地址,并不会创建一个新的对象。一般说对象拷贝其实是指 深拷贝与浅拷贝
+浅拷贝：会创建一个对象,并进行属性赋值,不过对引用类型的属性只会赋值对象地址
+深拷贝：会创建一个对象，并完全复制了整个对象,包括引用类型的属性。
+
+关于 一级对象？？？
+浅拷贝只能拷贝一级对象，
+js的内存分栈内存和堆内存，一级对象都存在栈内存中，而二级对象开始只是在栈内存中存了一个地址映射到堆内存。
+由于浅拷贝只是拷贝一级对象的数据，而拷贝的只是二级对象的地址，所以原始对象和克隆的对象的二级对象其实都是指向同一个堆内存，所以改这个那个也跟着变。
+
+【数组】
+'...arr' 在赋值运算符'=' 右侧，做赋值操作时（浅拷贝 操作之一！还有一种深拷贝方式arrNew = JSON.parse(JSON.stringfy(arrOld))）
+const arr4 = [...arr]
+console.log(arr4); //输出结果[2, 4, 21, "hell", "你好"]
+【对象】
+let obj = {a: 1,b: 2};
+let obj1 = {...obj}; 等价于 let obj2 = Object.assign({}, obj);
+1.对象 中的扩展运算符(...)用于取出 原对象中的 所有 可遍历属性，拷贝到当前对象之中。
+2.Object.assign方法用于对象的合并，将原对象中所的属性复制到目标对象中。（第一个参数是目标对象，后面的参数都是原对象。如果 目标对象 与 一个或多个原对象 有 同名属性，则后面的属性会覆盖前面的属性)。
+
+let obj = {
+    a: 1,
+    b: 2
+};
+
+》》{...obj}方式 浅拷贝，
+let obj1 = {...obj};
+【obj与obj1不指向 同一个地址，但obj和obj1中的方法（嵌套对象）却仍指向同一地址，即“浅拷贝”】
+console.log(obj1); //{a: 1, b: 2}
+console.log(`obj === obj1？：${obj === obj1}`); //false，obj与obj1 不指向 同一个地址
+
+》》Object.assign({}, obj)方式 浅拷贝，
+let obj2 = Object.assign({}, obj);
+【obj与obj2不指向 同一个地址，但obj和obj2中的方法（嵌套对象）却仍指向同一地址，即“浅拷贝”】
+console.log(obj2); //{a: 1, b: 2}
+console.log(`obj === obj2？：${obj === obj2}`); //false，obj与obj2 不指向 同一个地址
+
+》》JSON序列化反序列化 深拷贝，
+【obj与obj3 不指向 同一个地址，obj和obj1中的方法 也不指向 同一个地址。“深拷贝”，不过效率低，且局限于能够被JSON序列化的一般对象，无法处理函数、正则表达式、特殊类型的对象（如Date对象）等】
+let obj3 = JSON.parse(JSON.stringify(obj));
+console.log(obj3); //{a: 1, b: 2}
+console.log(`obj === obj3？：${obj === obj3}`); //false，obj与obj3 不指向 同一个地址
+
+》》直接拷贝 对象的 地址，
+【obj与obj4指向 同一个地址，obj和obj1中的方法（嵌套对象）也指向同一地址，即“引用拷贝”】
+let obj4 = obj;
+console.log(obj4); //{a: 1, b: 2}
+console.log(`obj === obj4？：${obj === obj4}`); //true，obj与obj4 指向 同一个地址
+
+
+
+
+for(key in obj){ 
+    console.log(`${key}--${obj[key]}`); //第一次a--1，第二次b--2，遍历到了a、b两个属性
+}
+
+//原obj中的属性a被设置为 不可枚举之后，再次遍历obj
+Object.defineProperty(obj,'a',{enumerable:false}); 
+
+for(key in obj){
+    console.log(`${key}--${obj[key]}`);  //b--2，只遍历到了b属性
+}
+let obj1 = {...obj};
+console.log(obj1); //{b: 2}，扩展运算符 只 拷贝到了 可枚举属性b
+
+let obj2 = Object.assign({}, obj);
+console.log(obj2); //{b: 2}，，Object.assign 也只 拷贝到了 可枚举属性b
+
+
+》》》》》》》》》》》》》》》》》》》》》》》》》》》》》》》》
+
+
+
+》4.将 伪数组 转化为 真正的数组
+const divs = document.querySelectorAll('div')
+console.log(divs)
+const divArr = [...divs]
+console.log(divArr)
+
+》》补充：其它将伪数组转为真正数组的方式：Array.from(divs)或Array.prototype.slice.call(divs)
+
+》5.将 字符串 分割为 数组
+let arr = [...'helloworld'];
+console.log(arr); // ["h", "e", "l", "l", "o", "w", "o", "r", "l", "d"]
+
+【rest运算符】特点：arr数组长度不确定
+'...arr'作为 函数声明时的 形参；
+'...arr' 在赋值运算符'=' 左侧，接收值时。如解构数组时 let [a, ...arr] = [1,2,3,4]; console.log(arr);//[2,3,4]
+
+
+五、错误异常 处理
+// 使用 try { } catch (error) { } ，将容易出错的代码放入try中，一旦代码报错，也不会影响其外部后续重要代码的执行。
+        try {
+            /* if (true) {
+                throw '满足条件，则抛出 提示信息【之后try中剩余代码 中断执行】'
+            } */
+
+            // 若try中代码报错，try中剩余代码 中断执行。具体的报错信息会被catch捕捉，输出 参数error即可得到。
+            console.log(b);
+        } catch (error) {
+            // console.log(error)
+        }
+
+六、数组、对象与字符串的 解构【注意：1.变量 对应 原数据中 值 的所在的。2.两边的数据结构要保持一致】
+        // 解构赋值，就是从数组或者是对象中提取出对应的值，通过 相同的数据结构，将提取的值赋值给不同的变量
+        // 解构数组
+        var arr = [
+            { userName: 'Wangcai', age: 18 },
+            [1, 2],
+            66
+        ];
+        let [
+            { userName, age },
+            score,
+            id
+        ] = arr;
+        console.log(userName);//Wangcai
+        console.log(age);//18
+        console.log(score);// [1, 2]
+        console.log(id);//66
+    </script>
+-----------------------------------------------------
+    <script>
+// 对象的解构
+        let obj = {
+            arr: ['hello', { msg: 'es6' }]
+        }
+        // 把hello str1  es6 str2
+        let {
+            arr: [
+                str1, { msg: str2 }
+            ]
+        } = obj
+        console.log(str1);
+        console.log(str2);
+    </script>
+
+    <script>
+        // 对象的不完全解构
+        let obj1 = {
+            f1: function () {
+                console.log(1);
+            },
+            f2: function () {
+                console.log(2);
+            },
+            f3: function () {
+                console.log(3);
+            },
+        }
+        // 把f1从对象中解构出来 将f1函数的地址赋值给ff1
+        let { f1: ff1 } = obj1;
+        ff1();
+        /* let { f1: f1 } = obj1;
+        let { f1 } = obj1;//对象中 键 与 值 同名时，可只写一个值
+        f1(); */
+    </script>
+-----------------------------------------
+    <!--     <script>
+        // 字符串的解构赋值 某种意义上可以参考数组
+        var str = 'helloEs6';
+        let [a, b, c, d, , e] = str;
+        console.log(a);//h
+        console.log(b);//e
+        console.log(c);//l
+        console.log(d);//l
+        console.log(e);//E,前面的o没有接收，被隔过去了
+    </script> -->
+
+    <script>
+        var str = 'hel';
+        // 能不能结构成对象呢？  可以
+        // 如果需要解构成对象 需要包装
+        let str1 = new String(str);
+        var {
+            0: f,
+            1: g,
+            2: h,
+            length: i//对象元素个数
+        } = str1;
+        console.log(f);//h
+        console.log(g);//e
+        console.log(h);//l
+        console.log('str1中元素个数：' + i);//3
+    </script>
+
+----------------------------------------------------------------------------------
+
+七、ES6+的一些常用方法
+【Object.assign(objTarget,obj1,obj2...)】
+1.浅拷贝只能浅拷贝 可枚举属性；
+2.将原对象obj1，obj2...中的值拷贝给目标对象objTarget，并返回 新objTarget。
+示例：
+let _obj = {}, obj = {}, obj1 = { a: 1 }, obj2 = { b: 2 };
+Object.assign(obj, obj1, obj2); // 浅拷贝（只能浅拷贝 可枚举属性）
+// 键值对 不可枚举，该键值对将无法被Object.assign()浅拷贝；for...in也无法遍历到。
+//Object.defineProperty(obj, 'c', {value: 'er'}),在obj中添加键值对 c:'er'
+Object.defineProperty(obj, 'a', {
+    // value: 1,
+    enumerable: false//将obj对象中的 a:1 设定为 不可枚举
+});
+for (let key in obj) {
+    console.log(obj[key]);// 2，遍历不到 a:1
+}
+console.log(Object.assign(_obj, obj));// {b: 2}， _obj拷贝不到 a:1
+
+
+【WeakSet与Set异同（Map、WeakMap同理）】
+
+// 将对象添加到 WeakSet 中
+weakSet.add(obj1);
+weakSet.add(obj2);
+// 垃圾回收演示：在没有其他引用的情况下，对象被垃圾回收
+obj2 = null;
+console.log(weakSet.has(obj2)); // 输出: false
+
+相同点：参数为 唯一值，必须是“可迭代的”（如 对象或数组）
+不同点：
+WeakSet：
+1.弱引用：当我们将 obj2 设为 null 时，虽然它曾经存在于 WeakSet 中，但由于没有其他变量引用它，JavaScript 可能会在某个时刻将其垃圾回收。
+2.参数只能是“对象”
+3.不具备迭代和遍历功能，因此无法直接遍历其中的元素。
+
+Set：强引用；可迭代对象、数组或其他可迭代的数据结构 作为参数；可迭代
+
+
+【class中的set、get访问器】
+用途：
+1.可以在设置属性值之前执行验证操作，确保属性的值符合特定的规则和条件。
+2.创建计算属性，添加部分逻辑，针对实例属性的不同的值返回相应结果。
+注意：
+1.get 和 set 访问器只能用于类的实例属性，而不能用于类的静态属性。
+2.get 访问器使您能够创建计算属性，这些属性的值是通过计算而来的，而不是存储在类中的。
+
+举例（radius、area均为自定义的计算属性、_radius为实例属性）：
+class Circle {
+  constructor(r) {
+    this._radius = r; // 使用下划线表示属性是私有的
+  }
+  // static代码块（与讨论中心无关，加载class时会直接执行“代码块”内部代码）
+  static {
+   console.log("class已经加载。。。");
+  }
+
+  // 通过 get 访问器读取半径
+  get radius() {
+    return this._radius;
+  }
+
+  // 通过 set 访问器设置半径，可以添加验证逻辑
+  set radius(value) {
+    if (value <= 0) {
+      throw new Error('Radius must be positive');
+    }
+    this._radius = value;
+  }
+
+  // 计算圆的面积
+  get area() {
+    return Math.PI * this._radius * this._radius;
+  }
+}
+
+const circle = new Circle(5);
+console.log(circle.radius); // 读取半径
+circle.radius = 10; // 设置半径
+console.log(circle.area); // 计算面积
+
+》》对比ES13中class的私有属性、静态属性(也叫类属性，有static关键字)：
+ES13（2022年）中：
+1.私有（实例）属性以‘#’开头，只能在class内部使用，不能直接在外部通过 “实例名.#age”访问，可通过class原型上的公有方法间接访问。而在ES6中，能在外部通过 “实例名.age”访问私有（实例）属性。
+2.静态属性以‘static #’开头， 通过 “类名.#age”访问。
+
+
+
+ES7中：指数运算符num1 ** num2，等价于Math.pow(num1,num2)。“(Array/String).includes”
+
+
+ES8中：
+
+
+1.【Object.entries(obj)、Object.keys(obj)、Object.values(obj)】
+Object.entries(obj)返回obj中 所有 可枚举 键值对 构成的一个 二维数组;
+Object.keys(obj)返回obj中 所有 可枚举键  构成的key数组;
+Object.values(obj)返回obj中 所有 可枚举键的 值  构成的value数组;
+
+2.【str.padStart(length,'*')、str.padEnd(length,'*')】
+let _str = str.padStart(length,'*');//返回的 _str 字符串为 "在原字符串 str基础上，在其 前面使用 '*' 填充"，新字符长度为length。
+示例：(str.padEnd用法，同理)
+const str  = '12', idNum= '4109285646';
+console.log(str.padStart(5,'0'));//00012
+console.log(idNum.slice(-4).padStart(idNum.length,'*'));//******5646
+
+3.函数形参后允许多一个“,”，如fn(num1,num2,)
+4.async关键字
+
+
+
+ES9中：
+
+
+1.Rest/Spread 属性（rest、展开运算符“...”）；
+2.promise上添加了finally关键字；
+3.正则表达式命名捕获组、正则表达式反向匹配【获得匹配字符串中“符合条件的”某个 子串】
+4.异步迭代：处理需要异步操作的可迭代对象，例如异步生成器函数、Promise 数组等;
+》》4.1“生成器函数”是一种特殊类型的函数，它可以在执行过程中暂停，并在需要时继续执行，而不会阻塞整个程序。
+yield 用于在生成器函数内部产生一个值，并返回给调用者，并将执行暂停在那里，然后允许您在下一次调用生成器函数时继续执行。
+》》》使用场景：
+【1.生成序列，如生成斐波那契数列】
+每次调用 fibGen.next() 时，生成器函数的执行会从上一次暂停的地方继续执行，并返回一个对象，其中包含生成器当前的值。
+这里的流程控制通过生成器函数的暂停和恢复来实现，通过调用 fibGen.next() 来推进生成器的执行。
+function* fibonacci() {
+  let a = 0, b = 1;
+  while (true) {
+    yield a;
+    [a, b] = [b, a + b];
+  }
+}
+const fibGen = fibonacci();
+console.log(fibGen.next().value); // 0
+console.log(fibGen.next().value); // 1
+console.log(fibGen.next().value); // 1
+console.log(fibGen.next().value); // 2
+// 继续生成下一个斐波那契数...
+
+
+》》4.2使用 for await...of 循环迭代“异步可迭代对象”（“异步可迭代对象”必须实现 Symbol.asyncIterator 方法，该方法返回一个异步迭代器对象。异步迭代器对象的 next() 方法返回一个 Promise，用于获取下一个值。）
+》》》使用场景：
+【1.处理多个返回 Promise 的操作时，如，处理多个 HTTP 请求的响应数据。】
+const urls = ['https://example.com/1', 'https://example.com/2', 'https://example.com/3'];
+async function fetchData() {
+  const responses = urls.map(url => fetch(url)); // 返回 Promise 数组
+  for await (const response of responses) {
+    const data = await response.json(); // 解析 JSON 数据
+    console.log(data);
+  }
+}
+fetchData();
+
+【2.数据库查询（执行异步数据库查询并迭代结果集时）】
+async function fetchFromDatabase() {
+  const results = await queryDatabase(); // 异步数据库查询
+  for await (const result of results) {
+    console.log(result);
+  }
+}
+fetchFromDatabase();
+
+【3.异步读取目录，处理文件时】
+import fs from 'fs/promises';
+async function readFiles() {
+  const files = await fs.readdir('/path/to/directory'); // 异步读取目录
+  for await (const file of files) {
+    const content = await fs.readFile(`/path/to/directory/${file}`, 'utf-8'); // 异步读取文件内容
+    console.log(content);
+  }
+}
+readFiles();
+
+
+
+ES10中：
+
+
+1.【arr.flat(num)数组（扁平化） 降维】
+示例：
+const arrThree = [
+            10, 20, [30, 40, 50], [300, 400, 500],
+            [
+                [111, 222], [333, 444]
+            ]
+        ]
+console.log(arrThree.flat(1));//返回一个 三维 降成 二维 的新数组
+console.log(arrThree.flat(2));//返回一个 三维 降成 一维 的新数组
+
+【arr.flatMap(function(){})，等同于arr.Map().flat(1)】
+function中的 函数先 映射处理 arr中每一项， 对每一项的处理结果都是一个数组，也就是说对arr整体的映射结果是一个 二维数组。之后会将其扁平化，最终返回 一个 一维数组。
+示例：
+let messages = ["wc", "xq", "z3"];
+// 二维数组
+// [['w', 'c'],['x', 'q'],['z', '3']]
+console.log(messages.map(item => item.split("")));
+//展平后的 一维数组
+// ['w', 'c', 'x', 'q', 'z', '3']
+console.log(messages.flatMap(item => item.split("")));
+// ['w', 'c', 'x', 'q', 'z', '3']
+console.log(messages.map(item => item.split("")).flat(1));
+
+2.Object.fromEntries()为Object.entries(obj)的逆操作
+用途：对查询字符串中的键值对存入对象中
+let queryString="?name=wc&age=18&height=1.88"
+let params =new URLSearchParams(queryString);
+console.log(params.get("name"));//wc
+console.log(params.get("age"));//18
+console.log(params.get("height"));//1.88
+for(let item of params)
+console.log(item);//['name', 'wc']、['age', '18']、['height', '1.88']
+let obj=Object.fromEntries(params);//将二维数组[['name', 'wc'],['age', '18'],['height', '1.88']]转化为对象
+console.log(obj);//{name: 'wc', age: '18', height: '1.88'}
+
+3.新增String.trimStart()、String.trimEnd()，拓展了String.trim()
+
+
+ES11中：
+
+
+1.【'??' 空值合并 运算符，要 区别于“逻辑或”】
+先看“逻辑或”：
+let info;//当info的值为 undefined、null、0、'' 、NaN、false时
+console.log(info || '默认值');//这里的info会隐式转换为 false，输出结果为 "||"后面的 '默认值'。
+而 空值合并 运算符，只有当 info值 为 undefined 或null 时，才会 返回 "||"后面的 '默认值'，否则会返回 原来的值。
+示例：
+console.log(undefined ?? '默认值');//'默认值'
+console.log(null ?? '默认值');//'默认值'
+console.log(0 ?? '默认值');//0
+console.log(false ?? '默认值');//false (不同于'||'，空值合并 运算符 返回哪个值，与Boolean类型 无关)
+
+2.【'?.' 可选链 运算符，当目标属性为undefined时自动中断，不会报错】
+
+3.引入了bigInt，当整型值超过Number.MAX_SAFE_INTEGER时，计算会不准确，于是引入了bigInt。但只能同类型值进行运算
+bigInt类型值，如“9007199254740991n”,注意有“n”后缀
+
+4.globalThis在node下默认指global，浏览器客户端默认指window
+5.for...in...形成标准
+
+
+
+
+num = num + 2，等同于num += 2
+ES12中补充：'/='、'*='、'%='、'||='、'&&='、'??='，同理。
+
+
+ES13中,
+1.引入了Object.hasOwn(obj,key)【Object上面的静态方法（也叫class方法）】
+【区分Object.hasOwn()与Object.prototype.hasOwnProperty()】
+Object.hasOwn为直接挂载在Object上的静态方法，用于判断obj是否存在某"私有属性（与原型无关）"
+Object.prototype.hasOwnProperty为挂载在Object.prototype上的公有方法，用于判断obj是否存在某"私有属性（不含继承自原型的共有属性）"
+注意：没有prototype的Object.create(null)对象，不存在hasOwnProperty方法，但仍然可以使用Object.hasOwn()
+
+
+----------------------------------------------------------------------------------
+
+八、常见的 基本构造器（可以 使用new关键字 创建对象的函数）
+【注意：】
+1.undefined、null、Symbol和BigInt 不能作为 构造器；
+2.基本构造器有：Number、Boolean、String、Object、Array、Date等；
+3.实例化对象 的产生 除了要有对应的 构造器，还需要对应的 原型对象，缺一不可！
+4.一个函数（构造器）上的prototype属性指向的对象 和 通过“new关键字+这个函数（构造器）”创建出来的 实例对象上的__proto__所指向的是 同一个对象。只不过，__proto__指向的一般叫 隐式原型对象，prototype指向的，一般叫 显式原型对象。
+5.每一个 原型对象上 都有一个constructor属性，指向它对应的构造器；每一个 实例对象上 都有一个__proto__属性，指向它对应的 原型对象。（补充：Object.create(null);能返回一个 没有属性的，纯净的 空对象）
+【其它：】
+1.【在基本构造器中，除Object外，其它构造器对应的 原型对象，是 Object构造器 的一个 实例】
+String.prototype instanceof Object;// true
+Object.prototype instanceof Object;// false,  Object构造器 对应的 原型对象 不是Object构造器 对应的一个实例
+
+Object.prototype === new Object().__proto__; // true,  Object构造器对应的 显式原型对象 就是 Object实例对象 对应的 隐式原型对象
+Object.prototype.constructor === Object; // true， Object原型对象 上的constructor 属性 指向Object构造器（构造函数）
+
+2.【Object原型对象 的原型对象是null】
+Object.prototype.__proto__; // null。js对象的所有原始方法都在Object.prototype上，而Object.prototype的__proto__指向null
+Object.prototype.hasOwnProperty('hasOwnProperty');// true
+String.prototype.__proto__ === Object.prototype;// true
+
+3.【null是原型链上最顶层的对象[object Null]】
+【在基本构造器中，构造器对应的 原型对象，是 Object构造器 的一个 实例】
+new Object().__proto__.__proto__；// null
+new String().__proto__.__proto__.__proto__ ;// null
+new String().__proto__.__proto__.__proto__ === new Object().__proto__.__proto__;// true
+
+
+4.在 Js 中，所有的对象（包括字符串对象）都是 Object 的实例。
+String instanceof Function;// true
+Function instanceof Object;// true
+String instanceof Object;// true
+Object instanceof Object;// true
+
+
+
+Object.__proto__ instanceof Function;// false，
+Object.__proto__ instanceof Object;// true,
+Object.__proto__.__proto__===Object.prototype;// true,
+
+Object.getPrototypeOf(Object)===Object.__proto__;// true,   这里都返回浏览器原始方法ƒ () { [native code] }
+而Object.prototype返回的是Object构造函数对应的显式原型对象，即
+Object.getPrototypeOf(Object)===Object.prototype;// false
+
+__proto__ 指向"调用者"对应的"隐式原型对象"，该属性在 ECMAScript 6 中已经不推荐使用，而是由标准的 Object.getPrototypeOf 方法替代。
+一般对象都有一个内部属性 [[Prototype]]，而Object.getPrototypeOf(obj) 方法用于获取obj对象的"隐式原型对象"。
+----------------------------------------------------------------------------
+九、继承 (让多个构造函数之间建立关联, 子类继承了父类的属性和方法，便于管理和复用)
+【注意：
+》构造器，实例，显式原型对象都有    constructor属性，默认指向 构造函数，但指向哪个构造函数要具体分析。
+'11'.constructor === String; // true
+String.constructor === Function; // true
+Function.constructor === Function; // true
+Function.constructor === Object; // false
+
+》重置Son构造器的默认原型对象：Son.prototype = Object.create({constructor:Son})
+】
+
+1.原型继承（可继承父级的 ”公有属性和方法“）
+
+// 父类有2个私有属性
+function Father(name,age){
+    //this.name = name ;
+    //this.age = age; 
+}
+//    父类原型上有一个say方法 
+Father.prototype.say = function(){
+    console.log('say..');
+}
+function Son(name,age,className){
+    this.name = name ;
+    this.age = age; 
+    this.className = className; 
+}
+//将子类Son的原型对象 重定向为 ”特定的Father实例（仅此一个，之后的”新Son实例“的原型对象都指向它）。
+//【只会影响这之后的Son实例对象（转向后的Son实例通过__proto__先访问刚才的 新Son原型对象（即特定的Father实例），再通过__proto__访问到Father上的公有say方法）；
+//不会影响Father，也不会影响之前已创建的Son实例对象（若有的话）。】“
+Son.prototype = new Father();
+
+Son.prototype.constructor = Son;
+//1.将新原型对象Son.prototype的constructor指向由”Father构造器“恢复为”Son构造器“。
+//2.（Son.prototype既是Father的一个实例，也仍是Son的原型对象。【Son的原型对象并没有恢复为之前默认的，只改变Father实例（或Son原型对象，这里指只同一个对象）的constructor属性，不会影响属性与方法的继承，修正也意义不大】）
+
+let son1 = new Son('王五',17,'高一');
+son1.say();//say..
+----------------------------------------------------
+2.call继承(将 Son 对象作为上下文，以便在 Son 对象中初始化与 Father 构造函数相关的属性。调用了 Father 构造函数，执行一次函数)
+
+【将父类的私有属性 继承为子类的私有属性，不能继承公有属性（因为原型对象没有改变）】
+function Father(name, age) {
+    this.name = name;
+    this.age = age;
+}
+function Son(name, age, className) {
+    this.className = className;
+    Father.call(this,name,age);//执行一次Father(this,name,age);call中的this指向Father，
+}
+t son1 = new Son('王五',17,'高一');
+console.log(son1);//Son {className: '高一', name: '王五', age: 17}
+----------------------------------------------------
+3.组合继承（结合原型继承的优点和call继承的优点，继承父类的私有和公有属性、方法）
+
+function Father(name, age) {
+    this.name = name;
+    this.age = age;
+}
+function Son(name, age, className) {
+    // call继承的核心代码
+    this.className = className;
+    Father.call(this,name,age)
+}
+
+// 给原型对象身上创建一个say方法
+Father.prototype.say = function(){
+    console.log('say...');
+}
+
+// 原型继承的核心代码
+Son.prototype = new Father();
+
+//【寄生继承】 通过object.create创建一个”在Father.prototype原型链上的“空对象并赋值给Son.prototype，也能访问Father.prototype上的公有属性和方法
+//Son.prototype = Object.create(Father.prototype);
+
+let son1 = new Son('王五',17,'高一');
+console.log(son1);//Son {className: '高一', name: '王五', age: 17}
+son1.say();//say...
+
+------------------------------------------------------------------------
+4.class继承
+
+class Student {
+    // 在class声明类中 有一个构造器函数constructor
+    constructor(name, age) {
+        // 在里面写的属性 会挂载在”class的实例对象“上
+        this.name = name;
+        this.age = age;
+        this.work = function () {
+            console.log('work..');
+        }
+    }
+    //  在constructor外面写的属性 会挂载在”原型对象“上
+    say() {
+        console.log('say..');
+    }
+    static self() {
+        console.log('注意static关键字，挂载在”class类身上“的静态属性和方法self。。');
+    }
+}
+
+let stu = new Student ('张三', '18');
+console.log(stu);//Student {name: '张三', age: '18', work: ƒ}
+
+// 声明一个班长类 班长类去继承学生类的一些属性
+class Monitor extends Student{
+    constructor(name,age,id){
+        // 如果继承父类（student）的属性
+        // super调用父类的构造函数
+        super(name,age);
+        this.id = id
+    }
+}
+
+let mon1 = new Monitor('李四',18,01);
+console.log(mon1);//Monitor {name: '李四', age: 18, id: 1, work: ƒ}
+// 父类的公有属性和私有属性 都可以继承
+mon1.say();//say..
+
+------------------------------------------------
+【补充：static静态方法中的this不指向类的new实例，而是指向class本身】
+关于class中的static静态属性和方法的作用：
+
+1.将同类型的方法放进一个类中调用（方法与类相关但不需要创建类的实例）
+class MathUtils {
+    static add(a, b) {
+        return a + b;
+    }
+    static subtract(a, b) {
+        return a - b;
+    }
+}
+console.log(MathUtils.add(5, 3)); // 输出: 8
+
+2.存储常量值或配置：静态属性可以用于存储常量值或配置信息，以便在整个应用程序中共享和访问。
+class AppConfig {
+    static API_URL = "https://api.example.com";
+}
+console.log(AppConfig.API_URL); // 输出: https://api.example.com
+
+3.静态属性可以用于实现”单例模式“，确保【类 只有一个实例，适用于需要全局访问唯一对象的情况】。
+场景： 在一个应用程序中，需要一个全局配置管理器，以确保所有模块都使用相同的配置。
+class ConfigurationManager {
+    static instance = null;//可删除该行，在 Js 中，类的静态属性可以在需要时在构造函数中直接创建。
+    constructor() {
+        if (ConfigurationManager.instance) {
+            return ConfigurationManager.instance;
+        }
+        this.config = {}; // 配置数据
+        ConfigurationManager.instance = this;
+    }
+    setConfig(key, value) {
+        this.config[key] = value;
+    }
+    getConfig(key) {
+        return this.config[key];
+    }
+}
+
+const configManager1 = new ConfigurationManager();
+configManager1.setConfig("apiEndpoint", "https://api.example.com");
+
+const configManager2 = new ConfigurationManager();
+console.log(configManager2.getConfig("apiEndpoint")); // 输出: https://api.example.com
+
+console.log(configManager1 === configManager2); // 输出: true，两者是同一个实例
+
+
+4.工厂函数（适用于以一种 可重用的方式，通过接受不同的参数来创建不同类型的对象。）
+场景一：ShapeFactory 是一个工厂函数，用于根据不同的参数创建不同类型的图形对象（圆形、矩形、三角形）。
+这使得在应用程序中轻松创建不同类型的图形对象，而无需直接调用它们的构造函数。
+
+class ShapeFactory {
+    createShape(type, params) {
+        if (type === "circle") {
+            return new Circle(params.radius);
+        } else if (type === "rectangle") {
+            return new Rectangle(params.width, params.height);
+        } else if (type === "triangle") {
+            return new Triangle(params.side1, params.side2, params.side3);
+        } else {
+            throw new Error("Unknown shape type");
+        }
+    }
+}
+
+class Circle {
+    constructor(radius) {
+        this.radius = radius;
+    }
+    // 其他方法
+}
+class Rectangle {
+    constructor(width, height) {
+        this.width = width;
+        this.height = height;
+    }
+    // 其他方法
+}
+class Triangle {
+    constructor(side1, side2, side3) {
+        this.side1 = side1;
+        this.side2 = side2;
+        this.side3 = side3;
+    }
+    // 其他方法
+}
+const shapeFactory = new ShapeFactory();
+const circle = shapeFactory.createShape("circle", { radius: 5 });
+const rectangle = shapeFactory.createShape("rectangle", { width: 10, height: 6 });
+
+
+场景二：
+class Car {
+    constructor(make, model) {
+        this.make = make;
+        this.model = model;
+    }
+
+    static createFromYear(make, year) {
+        const currentYear = new Date().getFullYear();
+        const model = currentYear - year + 1;
+//静态方法中的 this 不是指向实例对象，而是指向类本身。创建一个新的 Car 对象实例，并返回该实例。
+        return new this(make, model);
+    }
+}
+
+const myCar = Car.createFromYear("Toyota", 2010);
+console.log(myCar); // 输出: Car { make: 'Toyota', model: 12 }
+
+------------------------------------------------------------------------
+
+十。深拷贝操作（手动递归复制、JSON.parse(JSON.stringify()) 和第三方库，如 Lodash、jQuery 等）
+
+由于 for...in 循环只会遍历对象的可枚举属性，并且 obj.hasOwnProperty(key) 用于过滤掉继承的属性，因此无法遍历到不可枚举属性。若要【深拷贝包含“不可枚举属性” 的 对象】，可以考虑使用其他方法，如 Object.getOwnPropertyNames()、Object.getOwnPropertySymbols() 等来获取对象的所有属性，包括可枚举和不可枚举属性，并进行相应的深拷贝操作。下面是一个使用 Object.getOwnPropertyNames() 方法来深拷贝包含不可枚举属性的对象的示例：
+
+function deepCopy(obj) {
+  if (obj === null || typeof obj !== 'object') {
+    return obj;
+  }
+
+  let copy = Array.isArray(obj) ? [] : {};
+
+  // 获取对象的所有属性，包括可枚举和不可枚举属性
+  const keys = Object.getOwnPropertyNames(obj);
+
+  for (let key of keys) {
+    const descriptor = Object.getOwnPropertyDescriptor(obj, key);
+    if (descriptor.hasOwnProperty('value')) {
+      copy[key] = deepCopy(obj[key]);
+    } else {
+      Object.defineProperty(copy, key, descriptor);
+    }
+  }
+  return copy;
+}
+
+// 示例对象
+let obj = {
+  name: 'Alice',
+  age: 25
+};
+
+Object.defineProperty(obj, 'email', {
+  value: 'alice@example.com',
+  enumerable: false
+});
+
+// 执行深拷贝
+let objCopy = deepCopy(obj);
+
+// 修改拷贝后的对象
+objCopy.name = 'Bob';
+objCopy.email = 'bob@example.com';
+
+// 输出原始对象和拷贝后的对象
+console.log(obj); // 输出: { name: 'Alice', age: 25, email: 'alice@example.com' }
+console.log(objCopy); // 输出: { name: 'Bob', age: 25, email: 'bob@example.com' }
+
+
+【深拷贝 不包含“不可枚举属性” 的对象、或数组！！！！】
+多数情况下，进行深拷贝的目的是为了复制对象的数据以及可变属性。而不可枚举属性通常不包含需要复制的重要数据，因此在深拷贝过程中忽略不可枚举属性通常不会对应用程序的功能产生重大影响。
+注意：
+for...in 循环只会遍历对象的 可枚举属性；
+obj.hasOwnProperty(key) 能过滤掉 继承的属性，获取自身所有可枚举的属性。
+
+
+//该深拷贝函数仅处理常见的对象和数组类型，对于特殊类型（如函数、Date对象、正则表达式等）或包含循环引用的情况需要进行额外处理。此外，在处理大型对象或嵌套层级较深的结构时，递归方式的深拷贝可能会导致性能问题。在这些情况下，可以考虑使用专门的第三方库来执行深拷贝操作。
+function deepCopy(obj) {
+  if (obj === null || typeof obj !== 'object') {
+    return obj;
+  }
+
+  let copy;
+  if (Array.isArray(obj)) {
+    copy = [];
+    for (let i = 0; i < obj.length; i++) {
+      copy[i] = deepCopy(obj[i]);
+    }
+  } else {
+    copy = {};
+    for (let key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        copy[key] = deepCopy(obj[key]);
+      }
+    }
+  }
+  return copy;
+}
+
+
+let obj = {
+  name: 'Alice',
+  age: 25,
+  nestedObj: {
+    prop: 'Hello'
+  }
+};
+
+let arr = [1, 2, [3, 4]];
+
+let objCopy = deepCopy(obj);
+let arrCopy = deepCopy(arr);
+
+console.log(objCopy);
+console.log(arrCopy);
+
+
+------------------------------------------------------------------------
+
+Object.getOwnPropertyNames(obj); // 返回一个数组，包含指定对象自身的（可枚举不可枚举的）所有属性名。
+Object.getOwnPropertySymbols(obj); // 返回一个数组，包含指定对象自身的所有符号属性的属性名。
+Object.getOwnPropertyDescriptors(obj); // 返回一个 二维对象，包含指定对象所有自身属性（包括非枚举属性）的属性描述符。常用于克隆对象，保留属性的属性描述符。
+Object.getOwnPropertyDescriptor(obj, 'name'); // 返回一个对象，包含指定对象上自有属性name对应的属性描述符。
+
+比如：
+const obj = {
+  name: 'John',
+  age: 25,
+  [Symbol('a')]: 'A',
+};
+
+const symbols = Object.getOwnPropertySymbols(obj);
+console.log(symbols); // [Symbol(a)]
+
+const descriptors = Object.getOwnPropertyDescriptors(obj);
+console.log(descriptors);
+// {
+//   name: { value: 'John', writable: true, enumerable: true, configurable: true },
+//   age: { value: 25, writable: true, enumerable: true, configurable: true }
+// }
+
+const descriptor = Object.getOwnPropertyDescriptor(obj, 'name');
+console.log(descriptor); // { value: 'John', writable: true, enumerable: true, configurable: true }
+
+------------------------------------------------------------------------
+
+【对象的 数据属性 和 访问器属性】
+对象的"属性描述符"可以根据属性的类型和定义方式，只具有其中的一部分属性，而不必包含所有的 value、writable、enumerable、configurable、get、set。
+
+》》字面量形式 直接定义属性，比如：
+const obj = {
+  '_computedValue': 42,
+
+  get computedProperty() { // 定义"computedProperty属性"的 get访问器
+    console.log('Getting computedProperty');
+    return this._computedValue;
+  },
+  set computedProperty(value) { // 定义"computedProperty属性"的 set访问器
+    console.log('Setting computedProperty to', value);
+    this._computedValue = value;
+  },
+};
+console.log(obj.computedProperty);         // 调用 get 方法，输出 'Getting computedProperty', 42
+obj.computedProperty = 24;                  // 调用 set 方法，输出 'Setting computedProperty to 24'
+delete obj._computedProperty;                 // 可删除 数据属性，返回 true
+delete obj.computedProperty;               // 不可删除 访问器属性，返回 false
+
+》》非字面量形式，通过Object.defineProperty定义属性，比如：
+定义 数据属性【存储普通的数据值value，可以通过点语法或方括号语法进行访问】：
+Object.defineProperty(obj, '_computedValue', {
+  value: 42, // 属性的值
+  writable: true, // 属性是否可写
+  enumerable: true, // 属性是否可枚举
+  configurable: true, // 属性的描述符是否可配置
+});
+
+定义 某元素的访问器属性【没有直接的值value，而是由 get 和 set方法组成，包含 getter和setter 方法，允许对属性的读取和写入进行自定义处理】
+Object.defineProperty(obj, 'computedProperty', {
+  get: function() {
+    // getter logic
+  },
+  set: function(value) {
+    // setter logic
+  },
+  enumerable: true,
+  configurable: true,
+});
+
+------------------------------------------------------------------------
+
+【函数作用域、词法作用域】
+
+函数作用域：若一个变量是在函数内部声明的，那么它只在函数内部可见，外部无法访问。这意味着变量的生命周期与函数调用相关。
+词法作用域：也称为静态作用域。变量的作用域是由在代码编写时，在函数中定义的位置就确定好的，与函数调用位置无关。在函数内部定义的变量可以访问外部函数和全局作用域中的变量，而外部无法直接访问函数内部的变量。
+var globalVar = "I'm global";
+function outer() {
+  var outerVar = "I'm outer";
+
+  function inner() {///////// 词法作用域，在定义时就确定，该函数内部能访问外层的所有变量
+    var innerVar = "I'm inner";
+    console.log(globalVar);  // 可以访问全局变量
+    console.log(outerVar);   // 可以访问外部函数的变量
+    console.log(innerVar);   // 可以访问本函数内部的变量
+  }
+
+  inner();
+}
+console.log(outerVar);  /////////函数作用域，无法访问局部函数内的变量。 报错，outerVar 在这里是不可见的

@@ -1,0 +1,349 @@
+【vue3中默认的vuex4与pinia异同】
+相同点：
+
+状态管理库：Vuex 4 和 Pinia 都是用于管理 Vue.js 应用程序的状态的库。
+响应性：Vuex 4 和 Pinia 都利用 Vue.js 的响应性系统来实现数据的响应式更新。
+支持 TypeScript：Vuex 4 和 Pinia 都提供了对 TypeScript 的良好支持，允许您更容易地进行类型推断和类型安全的状态管理。
+状态分模块：Vuex 4 和 Pinia 都支持将状态分为模块，以便更好地组织和管理状态。
+插件和中间件：Vuex 4 和 Pinia 都支持插件和中间件的概念，允许您扩展和定制状态管理行为。
+
+不同点（创造者和维护者、语法和概念、类型推断和类型安全、性能优化、组合式API）：
+》Vuex 4
+是 Vue.js 官方维护的状态管理库，与 Vue 3 生态系统紧密集成。
+基于 Vuex 3 的概念，包括状态（state）、mutations、actions、getters 等。
+提供了一定程度的 TypeScript 类型支持，但类型推断相对较弱。
+在大型应用中可能需要额外的性能优化，如模块的懒加载等。
+》》优势：由 Vue.js 团队维护和支持，具有广泛的社区支持；已经在 Vue 2 项目中得到广泛使用，生态系统相对成熟；对于已经使用 Vuex 3 的项目，升级到 Vuex 4 相对较容易
+》》不足：对于 TypeScript 用户来说，类型推断不如 Pinia 强大；在某些情况下可能需要额外的性能优化，特别是在大型项目中。
+
+》Pinia
+是一个第三方库，专门为 Vue 3 开发，采用了更现代的状态管理理念。
+Pinia 引入了一些新的概念，如 store 实例、自动类型推断、类风格的定义等。
+Pinia 在 TypeScript 环境下提供更强大的类型推断和类型安全性。
+Pinia 在性能方面进行了更多的优化，包括支持按需加载、代码分割等。
+》》优势：强大的 TypeScript 支持，更容易进行类型推断和类型安全的状态管理；采用了 Vue 3 的 Composition API，更符合 Vue 3 的开发方式。
+性能优化方面的特性和设计，适用于大型应用和性能敏感的场景；更灵活的 API 和更现代的状态管理理念，适用于复杂的状态管理需求。
+》》不足：
+相对于 Vuex，Pinia 的社区和生态系统可能较小，可能需要更多自定义解决方案；对于已经使用 Vuex 3 的项目，升级到 Pinia 可能需要更多工作。
+
+使用：
+npm install pinia
+
+// store.js
+import { defineStore } from 'pinia'
+
+export const useStore = pinia.store()
+export const store = pinia
+
+export const useCounterStore = defineStore({
+  id: 'counter',
+  state: () => ({
+    count: 0,
+  }),
+  getters: {
+    doubleCount() {
+      return this.count * 2
+    },
+  },
+  actions: {
+    increment() {
+      this.count++
+    },
+  },
+})
+
+
+---------------------------------------------------------------------------
+【组合式API】
+ref、toRefs、toRef、isRef、unref、reactive、shallowRef、triggerRef
+
+
+
+
+
+
+
+------------------------------------------------------------------------
+【ts】
+ts有什么好处：ts有强大的提示能力，在编译代码时，就可以找到错误，避免项目上线运行时产生bug。
+
+重要：
+TypeScript 本质是带类型语法的Js，js算是ts的子集。ts提供了静态类型检查以帮助开发者在 编写代码时 捕获潜在的错误，但它并不会影响 JavaScript 运行时的行为。
+也就是说，TypeScript 代码被编译为 JavaScript ，之后在浏览器中执行时，JavaScript 引擎不会对 “不符合ts要求但符合js要求”的代码予以限制（不报错）。
+
+--------------------------------------------------------
+js中 原始类型有：
+简单类型》 number string boolean null  undefined
+引用类型》 对象 数组 函数
+
+ts中 新增类型：联合类型、类型别名、接口、元组、字面量类型、枚举、void、any、泛型 等
+--------------------------------------------------------
+以下就不同数据类型分别讨论：（注意：一旦使用let等关键字声明类型，后续只能 同种类型赋值）
+
+《简单类型 "变量: number"指定类型。【该变量只希望接受number类型赋值】》
+let age: number = 18;
+age = 'ok'//编辑器ts环境下 不同数据类型 赋值 会报错，
+console.log(age);//'ok',不过浏览器不会检测age数据类型，浏览器可正常执行
+let uname: string = "wangcai"
+let flag: boolean = false
+// null和undefined类型用的比较少
+let nullValue:null = null
+let undefinedValue: undefined = undefined
+
+《引用类型：数组》
+ts中定义“字符串数组”的2种方式（以string举例）
+let arr1 = ["a", "b", "c"];//方式一，推荐！ts自动类型推断为“纯字符串数组”
+let arr1 = ["a", "b", 1];//ts自动类型推断为ts中的“联合类型”，预设arr1是“（字符串，或数字 构成的）数组”
+
+let arr2: string[] = ["a", "b", "c"]；//方式二，添加“: string[] ”手动指定，预设arr2是“纯字符串数组”
+let arr3: Array<string> = ["ok", "hello"]；//方式三，添加“: Array<string>”手动指定，预设arr3是“纯字符串数组”
+----------------------------------
+ts中的“联合类型”，(string|number) 整体是一个联合类型，类型与类型之间使用“ | ”连接。2种方式。
+let arr1 = ["a", "b", 1];//“联合类型1”；ts自动类型推断为ts中的“联合类型”，预设arr1是“（字符串，或数字 构成的）数组”
+let arr2: (string | number)[] = ["a", 1, "c", 2];//“联合类型2”，添加“: (string | number)”手动指定，预设arr2是（字符串，或数字 构成的）数组”
+
+let timer: number | null = null；//添加“: number | null”手动指定，预设timer是"number类型数据，或者null，这里已初始化为null"
+let arr3: number | string[];//添加“: number | string[]”手动指定，预设arr2是"number类型数据，或者 一个字符串数组"【注意与(string|number) 区分，意义不同】
+----------------------------------
+ts中的“类型别名”。（当同一类型(引用)被多次使用,可以通过类型别名 简化）
+语法：“type 类型别名 = 具体类型”；“类型别名”命名遵循大驼峰命名规范，类似于变量；使用别名的方式和我们在 ts中使用“string、number等类型”是一样的
+type A = (number | string)[];//定义 类型别名A
+let arr: A;//使用 类型别名A；预设arr是“（字符串，或数字 构成的）数组”
+arr = [1, "a", 2];
+----------------------------------
+《引用类型：“函数类型”，是一种用于描述函数的类型的方式。函数类型指定了函数的 参数类型 和 返回值类型》
+
+【“函数声明”：】
+function add(a: number, b: number): number {
+    return a + b
+}
+
+【“函数表达式”：】
+//“函数表达式1”
+let add2 = (a: number, b: number): number => {
+    return a + b
+}
+//“函数表达式2”
+“通过使用 以“类似 箭头函数” 的方式定义的 type类型别名，为【一般的 函数表达式 中的函数】 添加类型”。只适用于函数表达式。：
+//预设 参数a、 参数b、函数返回值add3 都是number类型
+type AddFn = (a: number, b: number) => number;
+let add3: AddFn = (a, b) => {
+    return a+b
+}
+
+》》“函数表达式”中的“void类型和undefined类型”：
+//“():void”预设该函数“在ts环境下” 不存在 任何类型的返回值，即它是一个执行操作的函数而不是一个有返回值的函数。【不过js会默认其返回值为undifined】
+const say2 = ():void => {
+    console.log('hi');
+}
+// “():undefined ”预设返回值类型 必须为 undefined
+const say2 = ():undefined => {
+    console.log('hi');
+   // return undifined;//没有return则已，若有则必须return undifined，不然ts环境会报错
+}
+
+【函数 中的“可选参数 '?' ”，将参数标记为可选：】
+const fn = (n?: number) => {
+    // ...
+}
+//fn();或fn(10);均可
+----------------------------------
+《引用类型：“对象类型”，描述对象中的 属性 方法 的类型》
+let obj1 = {};
+
+// 指定对象里面的属性和方法
+//{ name: string; say(): void} 不换行，可以将" ; "换成，逗号" ,"
+let obj4: { name: string; say(): void} = {
+    name: "wangcai",
+    say(){}
+}
+
+// { name: string; say(): void} 中换行写,可以省略" ; "。
+注意：
+1.“say(): void”预设“在ts环境下”，say()调用并不返回任何值。
+2.“say(): void”可使用 箭头写法“say : () => void”
+let obj5: {
+    name?: string
+    say(): void
+} = {
+    name: "wangcai",
+    say(){}
+}
+----------------------------------
+
+【“interface接口”】
+
+//使用interface关键字 定义接口：
+interface Person{
+    name: string
+    age: number
+    sayHello:()=>void
+}
+//使用接口，p为person类型
+let p: Person = {
+    name: "wangcai",
+    age: 18,
+    sayHello(){}
+}
+
+//“interface接口的 【继承】”
+interface PersonInfo extends Person {
+    city:string
+}
+let p2: PersonInfo = {
+    name: "wangcai",
+    age: 18,
+    sayHello(){},
+    city:"beijing"
+}
+
+// "type 交叉（连接）类型"【类似于 interface接口的 “继承”】
+type Point2D = {
+    x: number,
+    y: number
+}
+// 使用“&”可以合并连接对象类型 叫交叉类型
+type Point3D = Point2D & {
+    z:number
+}
+
+let o: Point3D = {
+    x: 1,
+    y: 2,
+    z: 3
+}
+
+》》【type与interface异同剖析】
+相同点：
+1.“interface接口的 继承”还是"type 交叉（连接）"都是为了达到 类型的 复用。
+2.两者都可以与泛型一起使用，以创建参数化的类型。
+3.type 和 interface 都可以通过自定义，更好地描述数据结构。
+不同点：
+type 
+更适合用于定义联合类型、交叉类型、元组类型以及复杂的类型转换。它还支持更广泛的类型操作。
+不具有合并特性，多次声明同一类型会报错。
+通过“交叉类型 &”复用
+interface 
+更适合用于定义“对象”的结构，使用 interface 来描述类的形状，以便实现该接口的类必须具备特定的属性和方法。
+具有合并特性，可以多次声明同一接口，并将其合并为一个。这在扩展接口时非常有用。
+通过“extends”继承 复用
+
+----------------------------------类型推断start----------------------------------
+
+【“类型推断”，在TS中 存在类型推断机制，在没有指定类型的情况下，TS也会给变量提供类型。】
+注意：
+在开发做项目中，先把业务写完，再尝试添加类型约束；
+能省略手动指定类型的地方就省略，充分利用TS推断的能力，提高开发效率。
+使用ts最多的两个场景：1）给props添加类型约束 2）约束后端
+
+》变量age 类型 被推断为number类型
+let age1 = 18
+
+》函数的 返回值类型 会被自动推断为number类型
+let add = (num1: number, num2: number) => {
+    return num1 + num2
+}
+
+
+》"字面量类型"
+
+let age: 18 = 18;
+age = 19;//“报错：不能将类型19分配给类型18”。这里的age，"类型为18"！“ts环境下若想不报错”只能使用 初始化值18，无法被重新赋为其它值。
+
+》“元祖类型”
+
+// 元祖类型是在使用的时候,数据“类型的位置”和“数据的个数”，需要保持一致。
+let arr5: [string, number, boolean] = ['hello', 100, true]
+
+》ts环境中，let 和 const区别
+
+// 通过类型推断发现,str1类型是string ,str2类型是hello Ts
+let str1 = 'hello Ts'
+
+// const声明的str2“值”和“类型”都是"hello Ts"，不能改变
+const str2 = 'hello Ts'
+
+
+》any类型
+
+// 显式any情况：当变量的类型指定为 any 的时候，不会有任何错误，也不会有代码提示，TS会忽略类型检查。使用过多可能有漏洞，尽量避免使用。
+let obj: any = {
+    a: 1
+}
+obj = 1;
+obj = true;
+obj();//obj对象"()"调用js报错，由于预设any类型，ts没报错！
+
+// 隐式any 推导类型
+let g;
+g = 1;
+g = true;
+g = "hello"
+
+----------------------------------类型推断end----------------------------------
+
+《“泛型”解决复用类型  类型的参数化,（参数T遵循 大驼峰命名）。泛型在（类型别名、接口、函数上）的使用》
+
+//1) 泛型在“类型别名”上的使用：
+//定义的“类型别名（遵循 大驼峰命名）”后面加上<类型参数>，这种写法就是泛型语法，使用的时候传入 相应的值 即可。
+//类型别名User
+type User = {
+    name: string
+    age: number
+}
+//"含参数T的"类型别名 Data
+type Data<T> = {
+    msg: string,
+    code: number,
+    data:T
+}
+
+//类型别名 UserData，它是通过将 泛型类型别名 Data<T> 实例化为 Data<User> 而创建的。
+//这意味着 UserData 是一个特定类型的别名，它表示了一种数据结构，其中包含了一个 User 类型的数据，且已将 User 类型硬编码为 data 属性的类型。
+type UserData = Data<User>
+let res: UserData = {
+    msg: " hello",
+    code: 100,
+    data: {
+        name: "wangcai",
+        age: 18
+    }
+}
+
+----------------------------------
+// 2)泛型在接口上的使用：
+//“接口名称（遵循 大驼峰命名）”，后面加上<类型参数>。
+//这个接口就变成了 泛型接口，接口中所有成员都可以使用类型变量。
+//使用的时候传入【一般为string、number等 具体的类型值】即可。
+interface B<T>{
+    fn(): T
+    gn():T[]
+}
+
+let e: B<string> = {
+    fn() {
+        return "ok"
+    },
+    gn() {
+        return ["ok"]
+    }
+}
+
+----------------------------------
+// 3) 泛型在函数上的使用【注意 定义 和 调用方式】
+//“类型参数T”值为string、number等 具体的类型。
+<T> 是一个类型参数（Type Parameter），它表示这个函数是一个泛型函数，可以接受不同类型的输入，并返回相同类型的输出。
+也就是说，getId 函数的类型会随着传入的参数类型而变化。
+const getId = <T>(id: T): T => {
+    return id;
+}
+
+//我们告诉 TypeScript，我们希望 getId 函数接受一个 number 类型的参数"1"，并返回一个 number 类型的结果。
+let id1 = getId<number>(1);
+
+
+以上，等同于，
+const getId = (id: number): number => {
+    return id;
+}
+let id1 = getId(1);
