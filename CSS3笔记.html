@@ -566,7 +566,7 @@
 
 
 		/* ********制作3D立方体******* */
-		@keyframes auto {
+		@keyframes moveBox {
 			0% {
 				transform: rotateX(0);
 			}
@@ -602,7 +602,7 @@
 			transform-style: preserve-3d;
 			/*3d盒子动画时的旋转中心*/
 			transform-origin: 50% 50% 75px;
-			animation: auto 8s infinite linear;
+			animation: moveBox 8s infinite linear;
 		}
 
 		/*定义 立方体每个面 的样式*/
@@ -743,7 +743,7 @@
 		}
 
 		h1 {
-			background-image: url('e:/慕课/js学习材料/CSS3笔记/imgs/文本描边填充.png');
+			background-image: url('./CSS3笔记/imgs/文本描边填充.png');
 			font-size: 1em;
 
 			/* 此为webkit私有属性，注意区别background-clip属性 */
@@ -865,14 +865,14 @@
 		</div>
 	</form>
 	<div>
-		<img src="C:/Users/lenovo/Desktop/慕课/js学习材料/CSS3笔记/imgs/rotate.png" />
+		<img src="./CSS3笔记/imgs/rotate.png" />
 		<p class="rotate">中心旋转</p>
 	</div>
 
 	<p class="skew">中心扭曲</p>
 
 	<div
-		style="width:260px; height:270px; background-image: url(C:/Users/lenovo/Desktop/慕课/js学习材料/CSS3笔记/imgs/translate.png); background-repeat:no-repeat; background-size:250px;">
+		style="width:260px; height:270px; background-image: url(./CSS3笔记/imgs/translate.png); background-repeat:no-repeat; background-size:250px;">
 		<div class="translate"">absolute脱离文档流（被忽略，不占空间可覆盖。似fixed）</div>
 </div>
 
