@@ -16,6 +16,8 @@ ESC 退出编辑
 :q! 撤销并退出
 
 
+------------------------------------------------------------------------------------------------
+
 Git
 
 初始化git仓库
@@ -26,16 +28,45 @@ git config --global user.name "zhucheng2"
 git config --global user.email "1260750674@qq.com"
 
 显示中文
+设置为 false 表示关闭路径引用的引号。引号是为了处理可能包含空格或特殊字符的文件路径，以确保正确识别路径中的空格或特殊字符。将其设置为 false 会显示原始的文件路径，而不使用引号。
 git config --global core.quotepath false
 
+链接远程github仓库的方式：
+一、设置ssh
+1.生成 SSH 密钥对
+ssh-keygen -t rsa -C "1260750674@qq.com"
+2.将 SSH 密钥添加到 SSH 代理：
+ssh-add ~/.ssh/id_rsa
+3.将公钥文件（通常是 ~/.ssh/id_rsa.pub【貌似在C:\Users\lenovo\.ssh】）的内容添加到 GitHub 帐户的 SSH 密钥部分。
 
+二、使用 Personal Access Token（个人访问令牌）：
+GitHub》Settings》Developer settings》Personal access tokens》点击 "Generate token"
+将生成的令牌用作密码进行身份验证，或直接通过git remote set-url github https://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@github.com/zhucheng2/todo.git 关联远程仓库
+
+三、使用 Git 凭据管理器：
+启用 Windows 凭据管理器或 macOS 的 Keychain 访问来存储 GitHub 凭据。这些工具可以帮助您自动管理身份验证信息。
+------------------------------------------------------
+禁用 SSL 证书验证
+git config --global http.sslVerify false
+由于代理或其他因素导致 SSL 证书验证失败时，将 HTTPS 请求的 SSL 验证禁用，意味着 Git 不会验证远程服务器的 SSL 证书的有效性。
+但要注意，禁用 SSL 验证会降低安全性，只应在受信任的环境中使用。
+
+设置代理
+git config --global http.proxy http://127.0.0.1:<vpn端口>
+所在的网络环境需要经过代理才能访问外部资源。
+例如，你可能需要在公司网络中使用代理服务器来访问公共的 Git 仓库时，将 Git 的 HTTP 请求通过指定的代理服务器（这里是 http://127.0.0.1:<vpn端口>）进行转发。
+
+取消代理
+git config --global --unset http.proxy
+当你不再需要通过代理服务器，或者需要切换到另一个代理服务器时，你可以使用这个命令来取消之前设置的代理。
+------------------------------------------------------
 把文件add到 .git仓库(暂存区)
 git add ./index.html  把当前路径下的index.html文件 放入暂存区
 git add ./  把当前路径下的 所有修改的文件 放入暂存区
 
 把文件commit到 .git仓库
 git commit -m "commit描述"
-git commit --all -m "commit描述"   把当前路径下的 所有修改的文件 放入 .git仓库
+git commit --all -m "commit描述" 将所有已经被Git跟踪（1.之前就在版本控制中但做了新修改，且还未被add到暂存区；2.暂存区中的内容）的内容都直接包括在提交中。 放入 .git仓库
 
 查看当前状态
 git status
@@ -45,25 +76,160 @@ git log 查看历史提交日志(每次的commit完整版本号、作者、日�
 git log --oneline 查看简洁日志(每次的commit版本号、commit描述)
 git reflog 查看每次的操作记录(每次操作的版本号、Head标识、操作描述)
 
-回到指定版本
-git reset --hard Head~0 回退到 最新一次 代码提交的状态
-git reset --hard Head~1 回退到 上上次 代码提交的状态
-git reset --hard xxxxxx(版本号) 回退到指定 代码提交状态
-
 分支(主支master)
 git branch develop 创建 develop分支
 git branch -D develop  删除 develop分支
+git branch -m 旧名 新名 【重命名 分支】
 
 git checkout -b develop 创建并切换到develop新分支
 git checkout develop 切换到develop分支
+git switch 在 Git 2.23 版本后引入，会在切换分支时检查你的工作目录和暂存区，以确保没有未提交的更改，从而减少误操作的风险。
 git merge develop (同一个文件名内容合并 与develop内容相一致) 合并后要立即commit
 
-
-git branch -a【查看当前 .git仓库 所有分支】 或 git branch -r【查看已建立联系的远程分支】
+git branch【列出当前.git仓库中所有的本地分支，但不会显示与远程分支的关联】
+git branch -v【列出所有本地分支，并显示每个分支的最后一次提交的 SHA-1 哈希和提交消息】、git branch -vv【列出所有本地分支，并显示每个分支的最后一次提交的 SHA-1 哈希和提交消息，“以及它们是否已关联远程分支”。】
+git branch -a【列出本地 .git仓库配置中定义的 所有分支，包括所有 本地和“远程仓库”的分支】 或 git branch -r【列出本地 .git仓库配置中定义的 所有“远程仓库”的分支，不仅仅是已经与本地分支关联的远程分支。】
 (查看如github远程仓库分支的话,需要先clone到本地再切换到对应的 .git仓库所在目录)
 
 
+【注意：查看、或删除 未跟踪“文件夹”时，需要添加"-d"选项】
+git clean -i，打开交互窗口，查看未跟踪文件列表；通过键入字符，决定是否执行删除某个文件。
+git clean -n，会显示“可通过git clean删除”(即未被git跟踪)的文件列表，但不会实际执行删除操作。
+git clean -f 将当前目录下所有未跟踪的文件、或将未跟踪的指定文件 git clean -f 某路径/文件名 永久删除！！！【无法使用"git checkout -- 文件名"恢复】
 
+其它不重要命令：
+将当前目录下“所有未隐藏的”文件或文件夹，拷贝到指定文件夹【非git命令】
+cp -r * d:fileName，将所有未隐藏文件（包括 文件、文件夹及其内容）备份到d盘的fileName文件夹 。
+cp * d:fileName，将所有未隐藏文件（不包含文件夹）备份到d盘的fileName文件夹 。
+------------------------------------------------------------------------------------------------
+
+注意：HEAD须全部大写。
+
+【“版本回退”的2种方式（4类参数为 繁简hash值、标记tag、HEAD@{3.hours.ago}、HEAD^^===HEAD^2===HEAD~2）】 
+
+》二种 命令的差异，及不同的使用场景（以commitSHA参数为例）：
+
+git checkout commitSHA
+影响：git checkout 不会更改分支的状态或历史记录。它只是将你的工作目录和暂存区切换到所选提交的状态，但不会修改分支指针。如果你在分离头指针状态下做出了更改并提交，会创建一个新的匿名分支，但原始分支不会移动。
+使用场景：通常用于查看历史提交、检查特定提交的内容或创建临时分支来处理特定问题。
+
+git reset commitSHA 
+影响：git reset 可以更改分支的历史记录，因为它会将分支指针移动到指定提交，可能会导致提交 "丢失"，因此在使用时需要小心。
+使用场景：常见的用例包括撤销提交、重新整理提交历史、将提交合并到一起等。
+
+》》对“分离头指针状态”的补充：
+1.当你切换到这个特定的提交时，你的 HEAD 指针不再指向主分支，而是直接指向了你所选择的过去提交。这就是"分离头指针"状态，就像你置身于过去，但你不能在那个时间点上创建新的历史事件。
+2.尽管你不能改变历史，但你可以记录你所见到的事情。你对代码进行了修改，然后执行了提交操作。这将创建一个新的匿名分支，这个分支的指针将指向你的新提交。这个分支没有分支名，只有一个指向它的 HEAD 指针。
+3.当你完成了对过去的探索并且不再需要分离头指针状态时，你可以使用 git checkout 切换回主分支或其他分支，就像你返回到了现在。
+应用：
+进行临时性的实验、测试或修复问题，而不希望在此分支上创建永久的提交时，可在当前分离头指针处更改代码并commit以创建附加的匿名分支。
+在需要时将该匿名分支合并到某长期分支，或直接通过git branch -d xxxxxxx 丢弃当前分离头指针所附加的匿名分支。
+
+》四类 参数 详情：
+1.后面可以跟一些参数【当前HEAD 只能 前移 到指定的提交】，例如：HEAD，等同于HEAD~0；HEAD~1回退到上一次；HEAD^、HEAD^^、HEAD^^^回退到上一次、上上次、上上上次提交状态。
+2.【可以很方便地将 当前HEAD 后移 到指定的提交】通过提交生成的hash值回退 git reset abcdef1234567890abcdef1234567890abcdef12，或git reset <提交哈希值 前7位>
+3.通过为提交关联当前分支历史中唯一标记tag，如git reset v0.9.0
+4.回退到过去某个时间点的提交（3小时前的提交），不需要知道具体的提交哈希值。【对于两者的差异部分，可参考“三”；此时处于“分离头指针状态”】
+保留暂存区，丢弃在工作区已做的更改：git checkout HEAD@{3.hours.ago}【参数也可以是 繁简hash值、标记tag、HEAD@{3.hours.ago}、HEAD^^===HEAD^2===HEAD~2】
+同时保留 暂存区和在工作区已做的更改：git reset --soft HEAD@{3.hours.ago}
+
+
+-------------------------------------------------------------------------------------------
+
+
+【push到远程前，可对本地版本库、或暂存区内容进行更改】
+
+一、重新编辑commit描述
+git commit --amend
+
+二、通过HEAD^回退到上一次提交，将 已commit但未推送到远程仓库的更改（本地版本库中内容） 通过（soft）变更到暂存区状态、或（mixed）变更到 未跟踪状态、或 （hard）直接丢弃【早已跟踪，会直接被丢弃】
+注意：
+若已推送了最新的提交到远程仓库，之后再使用 git reset --soft HEAD^ 来修改提交历史，你可能需要使用 git push --force 来强push。
+强push会覆盖该远程分支上所有的历史提交记录，导致数据丢失，严重影响协作！！！
+git push --force-with-lease 命令会检查远程分支的状态，并仅在你的本地分支是远程分支的直接祖先时才允许强制推送。
+这可以有效避免覆盖其他协作者的工作，因为只有在远程分支没有新提交时才能执行推送。这是一种比较安全的强制推送方式。
+
+------------------------------------------------------------------------------------------------
+
+三、关于对“git reset中soft 、mixed、hard”，以及“git checkout -- 文件或文件夹名称”的具体解释：
+
+》》保留工作区中的更改内容 和 暂存区中 已暂存内容
+git reset --soft HEAD~1【保留工作区中的更改内容 和 暂存区中 已暂存内容，但分支的 HEAD 移动到了上一次提交，相当于"只是取消了上一次的提交"。】（soft 暂存1，工作1）
+
+》》重置暂存区，但保留工作区的更改（将之前暂存区中的文件置为“已跟踪，未暂存状态”；需要重新使用 git add 命令重新将更改添加到暂存区，然后进行新的提交）
+git reset，不会回退版本，等同于 git reset HEAD，等同于 git reset HEAD~0（mixed 为默认值，可省略。 暂存0，工作1）
+git reset --mixed HEAD~1，等同于git reset HEAD~1。回退到 "上一次 "的代码提交状态。
+
+》》丢弃 工作区中（已跟踪，但未add到暂存区）的更改，将目标文件还原到最近一次提交时的状态。但保留 暂存区中“已add待commit”内容（git checkout  暂存1，工作0）
+git checkout -- file/a.txt file/b.txt【注意--后，以及文件名之间的“空格”】
+git checkout -- file【file文件夹及其内容】
+git checkout -- .【所有“已跟踪，但未add到暂存区”的文件，注意--后的“空格”和"."选项】
+
+》》重置暂存区，并且丢弃 工作区中（已跟踪，但未add到暂存区）的更改。（hard  暂存0，工作0）
+git reset --hard【会将暂存区与工作区重置到与当前分支的最新提交状态一致。但这个命令不会删除工作区中 “未被 Git 跟踪”的文件】
+
+注意：
+1.“git能跟踪到的文件”有（1.之前就在版本控制中但做了新修改，且还未被add到暂存区（即未暂存）；2.暂存区中的内容（即已暂存））
+2.“未暂存的文件”：这是指已经存在于你的工作目录中，但你对它们做出了修改，而这些修改还没有被添加到 Git 的暂存区。这些文件在 Git 中是“已跟踪”的，因为它们在你的 Git 仓库中有历史记录，但当前的修改尚未提交。
+2.“未被 Git 跟踪的文件”：这是指工作目录中的文件，但它们尚未被 Git 跟踪，因此 Git 不知道它们的存在，也没有它们的历史记录。这些文件通常是 新创建的文件 或者被添加到 .gitignore 中以排除跟踪的文件。
+4.git reset 1.txt，等同于git reset --mixed 1.txt【git reset (--mixed) 文件或文件夹，可 改变指定“文件或文件夹”状态；然而，不能使用"--hard"或"--soft" 】
+不推荐使用“git reset --mixed 1.txt”更改指定文件状态。
+git reset 命令主要用于重置分支的位置，将分支移动到不同的提交或状态。若想要“撤销特定文件”的更改，并将其还原为最新提交的状态，可以使用 git checkout 命令
+
+------------------------------------------------------------------------------------------------
+
+四、补充：
+》1.git stash 
+
+git stash save‘描述’
+如 须临时切换分支时，
+【将当前工作目录中的未提交更改（包括已修改但未暂存的文件和已暂存但未提交的文件）暂存起来，即在不提交更改的情况下保存当前的工作状态，并在需要时随时恢复。。】
+git stash list 查看储藏的列表
+将之前储藏的更改重新应用到工作目录：
+git stash apply【可多次应用该储藏】 和 git stash pop【应用储藏后立即删除该储藏】
+示例：
+git stash apply stash@{0}【省略stash@{0}默认应用最新】
+------------------------------------------------
+》2.git rebase -i HEAD~n
+
+【（对历史影响过大，协作中不推荐）交互式重写历史：合并多次提交、删除提交，更改提交描述、甚至修改提交代码】
+详查pick 、reword、drop、edit命令
+------------------------------------------------
+》3.解决 Git 合并冲突通常需要以下步骤：
+
+3.0首先git pull拉取远程更改，以确保你的本地分支是最新的。
+3.1查看冲突位置。在 <<<<<<< HEAD 和 ======= 之间是你的本地更改，而在 ======= 和 >>>>>>> remote/branch-name 之间是远程分支的更改。
+3.2 编辑文件以解决冲突。你可以选择保留本地更改、远程更改，或者两者的组合，具体取决于你的需求。删除标记行（<<<<<<<、======= 和 >>>>>>>）并保存文件。
+3.3 一旦你解决了冲突，就add冲突文件到 暂存区（标记文件为已解决）；常规commit到 本地版本库、push到远程
+------------------------------------------------
+》4.git tag
+
+创建v1.0标签，并自动关联 当前提交
+附注标签，git tag -a v1.0 -m "版本 1.0 发布"
+轻量标签，git tag  v1.0【常用!“创建本地tag”】
+创建v1.0标签，并关联到 指定提交
+附注标签，git tag -a v1.0 -m "版本 1.0 发布" 目标提交hash值
+轻量标签，git tag  v1.0  目标提交hash值
+
+tag一旦与分支上的 某个提交关联，就无法直接更改且在分支的提交历史中唯一。只能通过git tag -d v1.0先删除该tag，再重新创建tag,并关联到某个提交。
+补充：
+1.删除远程关联的tag（不推荐，还是pull到本地改方便）git push origin --delete <tag-name>
+2.标签是指向特定提交的指针，因此不需要指定远程分支。 git push origin v0.9.0 【常用!“将名为 v0.9.0 的标签与其关联的提交推送到默认远程仓库 origin”】。其他开发人员可以从远程仓库获取这个标签，并在其本地仓库中查看相应的提交。
+
+git tag 查看 所有标签列表
+git show v1.0 查看关联v1.0的提交、标签消息和标签创建者等详细信息。
+
+【标签 与 分支 的关系】
+标签是针对特定提交的不可变的引用，不会随着新的提交而移动。通常不与分支直接绑定，它们是独立的。你可以在任何分支上创建标签，而且标签不会影响分支的功能和操作。
+
+一个仓库可以有多个分支，每个分支可以表示不同的开发或功能线，都有各自的提交历史，都有一个 HEAD表示当前所在的分支。通常，分支之间是相互独立的，可以并行进行工作。
+一个分支上可以有多个标签，这意味着多个标签可以指向同一个分支上的不同提交。这对于标记不同的版本或发布点非常有用。
+
+示例：假设有一个分支 main，你可以在不同的提交上创建多个标签，如 v1.0 和 v2.0。这两个标签分别指向 main 分支上的不同提交，用于表示不同的版本。
+
+总之，标签通常用于标记版本、里程碑和发布点，而分支用于并行开发和维护不同的功能和修复。
+
+---------------------------------------------------------------------------------------------------------------------
 
 GitHub
 
@@ -77,27 +243,50 @@ git clone https://github.com/zhucheng2/zhucheng2.github.io.git [项目名默认�
 origin 替代https://github.com/zhucheng2/zhucheng2.github.io.git
 git remote add origin https://github.com/zhucheng2/zhucheng2.github.io.git 添加新的远程仓库关联
 git remote remove <name>  删除指定的远程仓库关联
+git remote set-url github https://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@github.com/zhucheng2/todo.git 更改远程仓库关联
 git remote 查看关联的远程仓库名称,如origin
 git remote -v 查看关联的远程仓库的详细信息
 
+【为主支、或分支 设置各自的“上游分支”以简化push（pull）】
 git push(pull) origin -u master 加上-u，第一次这样push(pull)后，以后可以直接git push(pull)
-
+无法使用 -u 选项来设置默认上游分支，你可以手动设置当前分支的上游分支：将本地master与远程origin/master相关联【之后将本地master推送、或拉取远程origin/master可直接git push(pull)】
+git branch --set-upstream-to=origin/master
 
 删除远程仓库的分支sdd(例如主支master,分支sdd)
 git push origin :sdd
 或git push origin --delete sdd
 
 
-删除github上的 file文件【保留工作区中的file文件】
+
+【撤销跟踪 某目标】
+注意：这里的"-r file"指的是 递归"file文件夹及其内部所有文件"，若 目标为"非文件夹"（可指定多个文件，空格隔开），不需"-r"选项
+
+撤销.git版本库中对 "file文件夹及其内容" 的跟踪【保留工作区中的"file文件夹及其内容"】
 1.git rm --cached -r file
-2.git commit -m "删除GitHub上的file文件夹"
+2.git commit -m "撤销.git版本库中对 file文件夹及其内容 的跟踪"【若原"文件夹及内容"已经被commit到本地版本库，撤销后必须立即commit才能生效】
+
+撤销.git暂存区中对 "file.txt" 的跟踪【保留工作区中的"file.txt"】
+git rm --cached file.txt【暂存区中的"file.txt"，撤销跟踪立即生效，无需commit】
+
+
+》扩展：当上一次commit的目标只有一个file文件夹：
+git reset --mixed HEAD^ 基本等同于 git rm --cached -r file，
+相同点：因为它们都会 重置暂存区，保留工作区中的更改，并将file的状态置为“未跟踪状态”。
+不同点：
+前者，实际上修改了分支的历史记录，将上一次的提交从分支历史中删除，所以它会更改提交历史。
+后者，不会删除提交历史，而是停止跟踪文件或目录，如果之后提交了更改，这些更改将成为新的提交。
+
+同理：当上一次commit的目标只有一个file.txt文件：git reset --mixed HEAD^ 基本等同于 git rm --cached  file.txt
+【删除 文件】
 
 
 
+1.git rm -r file，或git rm file.txt
+将"版本库中已跟踪"的 file文件夹及其内容，或file.txt，从工作区中删除【即若目标在"暂存区"或"未被git跟踪"，不会被删除】
 
-
-
-
+2.rm -r file，或rm file.txt
+直接将目标从工作区中删除【无论是否被跟踪，不考虑文件的git状态】
+-----------------------------------------------------------------------------------------------
 
 
 Github pages 与Hexo博客搭建步骤（命令）
@@ -125,3 +314,129 @@ deploy:
   branch: master
 3.3.命令行输入npm install hexo-deployer-git --save  插件安装成功后会+hexo-deployer-git@x.x.x
 3.4.hexo g -d  每次本地添加新md文章,就以此生成静态页面发布到服务器
+
+
+-----------------------------------------------------------------------------------------------
+
+vscode常用快捷键（emmet速写语法）
+
+CTRL+enter跳到下一行
+CTRL+R切换工作区
+CTRL+P打开最近文件
+ALT + Z : 切换自动换行
+CTRL + TAB：切换选项卡
+
+注释
+ctrl /
+shift alt A,
+
+格式化文档 
+shift alt F,
+
+多行编辑
+alt + 鼠标左键选中,
+shift alt + 鼠标左键选中
+
+CTRL + SHIFT + L :选择所有 出现的当前选择
+相同 相邻 多个选中（多次点击）
+ctrl D
+
+CTRL + SHIFT + H : 多文件 同步替换 所有变量名
+
+复制上下行
+shift alt + 上下箭头
+删除行
+ctrl shift K
+
+选中当前 行
+ctrl L
+
+移动行
+alt + 上下箭头
+
+选中当前 行，缩进
+ctrl [
+ctrl ]
+
+查看报错
+ctrl shift M
+
+-----------------------------------------------------------------------------------------------
+
+前端资源发布surge插件相关命令
+
+$ surge -h
+
+  surge – single command web publishing. (v0.23.1)
+
+  Usage:
+    surge <project> <domain>
+
+  Options:
+    -a, --add           adds user to list of collaborators (email address)
+    -r, --remove        removes user from list of collaborators (email address)
+    -V, --version       show the version number
+    -h, --help          show this help message
+
+  Additional commands:
+    surge whoami        show who you are logged in as
+    surge logout        expire local token
+    surge login         only performs authentication step
+    surge list          list all domains you have access to
+    surge teardown      tear down a published project
+    surge plan          set account plan
+surge     启动服务器
+
+ encryption: *.surge.sh, surge.sh (74 days)
+             IP: 138.197.235.123
+   Success! - Published to vacuous-side.surge.sh
+
+------------------------------------------------------------------------------------------------
+
+网络重置命令
+
+netsh winsock reset
+netsh int ip reset
+netsh advfirewall reset
+ipconfig /flushdns
+ipconfig /release
+ipconfig /renew
+
+解释：
+netsh winsock reset:
+
+功能：重置Winsock（Windows套接字），它是Windows中处理网络连接的核心组件之一。该命令将清除套接字的配置和状态信息，并将其还原为默认设置。
+使用场景：当您遇到网络连接问题，如无法访问互联网、无法建立连接或网络速度缓慢时，可以尝试运行此命令以解决问题。
+netsh int ip reset:
+
+功能：重置TCP/IP协议栈的配置，包括IP地址、子网掩码、默认网关等网络设置。它可以帮助解决与IP配置相关的网络问题。
+使用场景：当您遇到与IP地址相关的网络连接问题，例如无法获取IP地址、无法连接到局域网或互联网等问题时，可以运行此命令。
+netsh advfirewall reset:
+
+功能：重置Windows防火墙的配置到默认设置。这将删除任何自定义的防火墙规则和策略，还原防火墙到初始状态。
+使用场景：当您怀疑Windows防火墙配置导致网络连接问题，或者需要清除已创建的自定义防火墙规则时，可以运行此命令。
+ipconfig /flushdns:
+
+功能：刷新本地DNS缓存，清除已解析的DNS记录。这可用于强制系统重新查找域名的IP地址，尤其是在域名解析问题时非常有用。
+使用场景：当您无法打开特定网站、域名无法解析或经常遇到DNS相关问题时，可以运行此命令。
+ipconfig /release:
+
+功能：释放当前网络连接的IP地址，将网络接口置于无IP地址状态。这可以帮助在需要时更改IP地址或解决IP地址冲突问题。
+使用场景：通常在更改网络设置或解决IP地址冲突时使用，然后可以使用ipconfig /renew来获取新的IP地址。
+ipconfig /renew:
+
+功能：尝试获取新的IP地址，可以与ipconfig /release一起使用，用于重新分配IP地址或解决IP地址冲突问题。
+使用场景：在释放IP地址后，运行此命令以获取新的IP地址。它也在动态分配IP地址的DHCP网络中使用，以获取新的租约。
+请注意，在执行这些命令之前，确保您拥有管理员权限，并谨慎操作，因为一些命令会重置网络设置或防火墙规则，可能会导致网络连接中断或其他不良影响。
+
+
+-----------------------------------------------------------------------------------------------
+
+------------------------gitee令牌
+4d8829b8fb2f004d5564dc503aa47374
+------------------------gitlab令牌
+glpat-1Gwmgtvr2ioRAYZykcPy
+------------------------v2ray生成订阅
+https://gitlab.com/api/v4/projects/45204648/repository/files/er%2Fqiang.yaml/raw?ref=main&private_token=glpat-1Gwmgtvr2ioRAYZykcPy
+
+
