@@ -42,7 +42,7 @@ ssh-add ~/.ssh/id_rsa
 二、使用 Personal Access Token（个人访问令牌）：
 GitHub》Settings》Developer settings》Personal access tokens》点击 "Generate token"
 将生成的令牌用作密码进行身份验证，或直接通过git remote set-url github https://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@github.com/zhucheng2/todo.git 关联远程仓库
-
+git remote set-url blog https://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@github.com/zhucheng2/zhucheng2.github.io.git
 三、使用 Git 凭据管理器：
 启用 Windows 凭据管理器或 macOS 的 Keychain 访问来存储 GitHub 凭据。这些工具可以帮助您自动管理身份验证信息。
 ------------------------------------------------------
@@ -243,7 +243,7 @@ git clone https://github.com/zhucheng2/zhucheng2.github.io.git [项目名默认�
 origin 替代https://github.com/zhucheng2/zhucheng2.github.io.git
 git remote add origin https://github.com/zhucheng2/zhucheng2.github.io.git 添加新的远程仓库关联
 git remote remove <name>  删除指定的远程仓库关联
-git remote set-url github https://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@github.com/zhucheng2/todo.git 更改远程仓库关联
+git remote set-url github https://令牌@github.com/zhucheng2/todo.git 更改远程仓库关联
 git remote 查看关联的远程仓库名称,如origin
 git remote -v 查看关联的远程仓库的详细信息
 
@@ -271,10 +271,10 @@ git rm --cached file.txt【暂存区中的"file.txt"，撤销跟踪立即生效�
 
 》扩展：当上一次commit的目标只有一个file文件夹：
 git reset --mixed HEAD^ 基本等同于 git rm --cached -r file，
-相同点：因为它们都会 重置暂存区，保留工作区中的更改，并将file的状态置为“未跟踪状态”。
+相同点：因为它们都会 重置暂存区，保留工作区中的更改。
 不同点：
-前者，实际上修改了分支的历史记录，将上一次的提交从分支历史中删除，所以它会更改提交历史。
-后者，不会删除提交历史，而是停止跟踪文件或目录，如果之后提交了更改，这些更改将成为新的提交。
+前者，实际上修改了分支的历史记录，将上一次的提交从分支历史中删除，所以它会更改提交历史。影响暂存区所有文件。源文件会继续被跟踪。
+后者，不会删除提交历史，如果之后提交了更改，这些更改将成为新的提交。可只 停止 对个别源文件的git跟踪，使之变成“未跟踪状态”。
 
 同理：当上一次commit的目标只有一个file.txt文件：git reset --mixed HEAD^ 基本等同于 git rm --cached  file.txt
 【删除 文件】
@@ -282,9 +282,22 @@ git reset --mixed HEAD^ 基本等同于 git rm --cached -r file，
 
 
 1.git rm -r file，或git rm file.txt
-将"版本库中已跟踪"的 file文件夹及其内容，或file.txt，从工作区中删除【即若目标在"暂存区"或"未被git跟踪"，不会被删除】
+只能将"版本库中（之前已commit提交过，原有的）"file文件夹及其内容，或file.txt，从版本库和工作区中 同步删除。
+【若对"非版本库的源文件，只是初次添加并跟踪在暂存区" 或 "从未被git跟踪"的目标 执行git rm，都会报错，不会成功删除。
+而前者，可加 '-f' 强制永久 同步删除，或 直接 使用'rm'命令 机械删除 但 仍保留在暂存区。】
 
-2.rm -r file，或rm file.txt
+补充：
+1.'git rm file.txt' 相当于两步操作：先 `git rm --cached file.txt` 停止对file.txt的git跟踪、再 `rm file.txt` 机械删除file.txt。
+由于在删除前，git已终止了跟踪，所以无法简单通过 `git checkout -- file.txt`撤销删除（git checkout -- 和git reset只影响“已跟踪文件”）。
+这时可以选择“第2种”方法，或者直接通过 `git reset` 版本回退 恢复。
+
+2.'git rm' 删除的源文件，在该操作commit到版本库 之前，
+可通过git stash save '状态描述'，保留当前工作状态（已成功执行git rm，但还未commit），此时 已删除文件将会 还原，不过之后若再git stash apply 应用 该工作状态 还会消失。
+所以在save后，直接把保存的stash通过drop或clear删除即可。
+
+若git rm成功，且已经commit，只能通过git reset版本回退。
+
+3.rm -r file，或rm file.txt
 直接将目标从工作区中删除【无论是否被跟踪，不考虑文件的git状态】
 -----------------------------------------------------------------------------------------------
 
@@ -306,6 +319,21 @@ node -v
 2.8. hexo server 或hexo s  启动服务器,会出现hexo is running at http://localhost:4000
 2.9.浏览器访问 http://localhost:4000就能看到hexo默认主题
 
+
+》》解除端口占用：
+1.
+关闭窗口时gitbash会提示“工作中的进程PID”；
+或者，输出4000端口工作中的进程PID【输出列表最后的 值】
+netstat -aon|findstr 4000
+
+2.
+强制结束 与 `node.exe`有关的 所有进程（比如node.exe同时在多个端口工作）
+taskkill /F /IM node.exe
+
+根据进程“pid值”强制结束 指定进程
+taskkill -f -pid 5032<进程PID>，【或者 taskkill /F /IM 5032<进程PID>】
+
+
 3.1.打开GitHub,master主支下新建zhucheng2.github.io仓库,zhucheng2为GitHub用户名
 3.2.配置D:/hexo/blog/_config.yml
 deploy:
@@ -314,7 +342,6 @@ deploy:
   branch: master
 3.3.命令行输入npm install hexo-deployer-git --save  插件安装成功后会+hexo-deployer-git@x.x.x
 3.4.hexo g -d  每次本地添加新md文章,就以此生成静态页面发布到服务器
-
 
 -----------------------------------------------------------------------------------------------
 
@@ -393,6 +420,26 @@ surge     启动服务器
 
 ------------------------------------------------------------------------------------------------
 
+
+vercel脚手架命令
+
+
+//安装 vercel 脚手架
+npm i -g vercel
+
+//登录 vercel 账号
+vercel login
+
+//认证成功后，在项目目录中，推送 当前目录中的所有文件
+vercel
+
+//选项确认后，推送到生产环境，到此成功部署
+vercel --prod
+
+
+
+
+------------------------------------------------------------------------------------------------
 网络重置命令
 
 netsh winsock reset
@@ -431,12 +478,4 @@ ipconfig /renew:
 
 
 -----------------------------------------------------------------------------------------------
-
-------------------------gitee令牌
-4d8829b8fb2f004d5564dc503aa47374
-------------------------gitlab令牌
-glpat-1Gwmgtvr2ioRAYZykcPy
-------------------------v2ray生成订阅
-https://gitlab.com/api/v4/projects/45204648/repository/files/er%2Fqiang.yaml/raw?ref=main&private_token=glpat-1Gwmgtvr2ioRAYZykcPy
-
 
